@@ -1,18 +1,24 @@
 defmodule Smokestack do
+  alias Spark.{Dsl, Dsl.Extension}
+
   @moduledoc """
-  Documentation for `Smokestack`.
+
+  <!--- ash-hq-hide-start --> <!--- -->
+
+  ## DSL Documentation
+
+  ### Index
+
+  #{Extension.doc_index(Smokestack.Dsl.sections())}
+
+  ### Docs
+
+  #{Extension.doc(Smokestack.Dsl.sections())}
+
+  <!--- ash-hq-hide-stop --> <!--- -->
   """
 
-  @doc """
-  Hello world.
+  use Dsl, default_extensions: [extensions: [Smokestack.Dsl]]
 
-  ## Examples
-
-      iex> Smokestack.hello()
-      :world
-
-  """
-  def hello do
-    :world
-  end
+  @type t :: module
 end

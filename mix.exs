@@ -13,12 +13,15 @@ defmodule Smokestack.MixProject do
       version: @version,
       elixir: "~> 1.15",
       start_permanent: Mix.env() == :prod,
+      consolidate_protocols: Mix.env() != :test,
+      elixirc_paths: elixirc_paths(Mix.env()),
       deps: deps(),
       description: @moduledoc,
       package: package(),
       source_url: "https://code.harton.nz/james/smokestack",
       homepage_url: "https://code.harton.nz/james/smokestack",
-      aliases: aliases()
+      aliases: aliases(),
+      dialyzer: [plt_add_apps: [:faker]]
     ]
   end
 
@@ -32,7 +35,6 @@ defmodule Smokestack.MixProject do
     ]
   end
 
-  # Run "mix help compile.app" to learn about applications.
   def application do
     [
       extra_applications: [:logger],
@@ -40,8 +42,6 @@ defmodule Smokestack.MixProject do
     ]
   end
 
-  # Run "mix help deps" to learn about dependencies.
-  # Run "mix help deps" to learn about dependencies.
   defp deps do
     opts = [only: ~w[dev test]a, runtime: false]
 
@@ -54,6 +54,7 @@ defmodule Smokestack.MixProject do
       {:earmark, ">= 0.0.0", opts},
       {:ex_check, "~> 0.15", opts},
       {:ex_doc, ">= 0.0.0", opts},
+      {:faker, "~> 0.17", opts},
       {:git_ops, "~> 2.6", opts},
       {:mix_audit, "~> 2.1", opts}
     ]
@@ -61,7 +62,10 @@ defmodule Smokestack.MixProject do
 
   defp aliases do
     [
-      "spark.formatter": "spark.formatter --extensions=Smokestack.Resource,Smokestack.Factory"
+      "spark.formatter": "spark.formatter --extensions=Smokestack.Dsl"
     ]
   end
+
+  defp elixirc_paths(env) when env in ~w[dev test]a, do: ~w[lib test/support]
+  defp elixirc_paths(_), do: ~w[lib]
 end

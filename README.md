@@ -6,25 +6,26 @@
 Smokestack provides a way to define test factories for your [Ash Resources](https://ash-hq.org/docs/module/ash/latest/ash-resource) using a convenient DSL:
 
 ```elixir
-defmodule Character do
-  use Ash.Resource, extension: [Smokestack.Resource]
+defmodule MyApp.Factory do
+  use Smokestack
 
-  attributes do
-    uuid_primary_key :id
-    attribute :name, :string
-    attribute :affiliation, :string
+  factory Character do
+    attribute :name, &Faker.StarWars.character/0
+    attribute :affiliation, choose(["Galactic Empire", "Rebel Alliance"])
   end
 
-  factory do
-    default do
-      attribute :name, &Faker.StarWars.character/0
-      attribute :affiliation, choose(["Galactic Empire", "Rebel Alliance"])
-    end
+  factory Character, :trek do
+    attribute :name, choose(["J.L. Pipes", "Severn", "Slickback"])
+    attribute :affiliation, choose(["Entrepreneur", "Voyager"])
+  end
+end
 
-    variant :trek do
-      attribute :name, choose(["J.L. Pipes", "Severn", "Slickback"])
-      attribute :affiliation, choose(["Entrepreneur", "Voyager"])
-    end
+defmodule MyApp.CharacterTest do
+  use MyApp.DataCase
+  use MyApp.Factory
+
+  test "it can build a character" do
+    assert character = MyApp.Factory.build!(Character)
   end
 end
 ```
