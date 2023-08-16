@@ -500,14 +500,21 @@ steps:
 
 - name: docs release
   image: minio/mc
+  environment:
+      S3_ENDPOINT:
+        from_secret: S3_ENDPOINT
+      ACCESS_KEY:
+        from_secret: ACCESS_KEY_ID
+      SECRET_KEY:
+        from_secret: SECRET_ACCESS_KEY
   depends_on:
   - build artifacts
   commands:
-  - mc alias set store ${S3_ENDPOINT} ${ACCESS_KEY} ${SECRET_KEY}
+  - mc alias set store $${S3_ENDPOINT} $${ACCESS_KEY} $${SECRET_KEY}
   - mc mb -p store/docs.harton.nz
   - mc anonymous set download store/docs.harton.nz
-  - mc mirror doc/ store/docs.harton.nz/$${DRONE_REPO}/$${DRONE_TAG}
-  - mc mirror doc/ store/docs.harton.nz/$${DRONE_REPO}
+  - mc mirror --overwrite doc/ store/docs.harton.nz/$${DRONE_REPO}/$${DRONE_TAG}
+  - mc mirror --overwrite doc/ store/docs.harton.nz/$${DRONE_REPO}
 
 # - name: hex release
 #   image: code.harton.nz/james/asdf_container:latest
