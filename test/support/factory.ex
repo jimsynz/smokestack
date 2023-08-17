@@ -23,6 +23,7 @@ defmodule Support.Factory do
     attribute :title, &Faker.Commerce.product_name/0
     attribute :tags, n_times(3..20, &Faker.Lorem.word/0)
     attribute :body, &Faker.Markdown.markdown/0
+    attribute :sub_title, &Faker.Lorem.sentence/0
   end
 
   factory Support.Post, :trek do

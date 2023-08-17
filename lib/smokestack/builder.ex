@@ -3,7 +3,7 @@ defmodule Smokestack.Builder do
   Handles the building of parameters and records.
   """
 
-  alias Ash.Resource
+  alias Ash.{Resource, Seed}
   alias Smokestack.{Dsl.Attribute, Dsl.Info, Template}
 
   @param_option_defaults [keys: :atom, as: :map]
@@ -23,10 +23,14 @@ defmodule Smokestack.Builder do
           | [{String.t(), any}]
           | [{atom, any}]
 
+  @type insert_options :: []
+
+  @type insert_result :: Resource.record()
+
   @doc """
   Build parameters for a resource with a factory.
   """
-  @spec params(Smokestack.t(), Resource.t(), atom, param_options) ::
+  @spec params(Smokestack.t(), Resource.t(), atom, map, param_options) ::
           {:ok, param_result} | {:error, any}
   def params(factory_module, resource, variant \\ :default, overrides \\ %{}, options \\ [])
       when is_atom(factory_module) and is_atom(resource) and is_atom(variant) and is_list(options) do
@@ -43,10 +47,49 @@ defmodule Smokestack.Builder do
   end
 
   @doc "Raising version of `params/2..5`."
-  @spec params!(Smokestack.t(), Resource.t(), atom, param_options) :: param_result | no_return
+  @spec params!(Smokestack.t(), Resource.t(), atom, map, param_options) ::
+          param_result | no_return
   def params!(factory_module, resource, variant \\ :default, overrides \\ %{}, options \\ []) do
     case params(factory_module, resource, variant, overrides, options) do
       {:ok, params} -> params
+      {:error, reason} -> raise reason
+    end
+  end
+
+  @doc """
+  Build a resource and insert it into it's datalayer.
+  """
+  @spec insert(Smokestack.t(), Resource.t(), atom, map, insert_options) ::
+          {:ok, insert_result} | {:error, any}
+  def insert(factory_module, resource, variant \\ :default, overrides \\ %{}, options \\ [])
+      when is_atom(factory_module) and is_atom(resource) and is_atom(Variant) and is_list(options) do
+    with {:ok, factory} <- get_factory(factory_module, resource, variant),
+         {:ok, params} <- build_params(factory, overrides, options) do
+      record =
+        resource
+        |> Seed.seed!(params)
+        |> Resource.put_metadata(:factory, factory_module)
+        |> Resource.put_metadata(:variant, variant)
+
+      {:ok, record}
+    end
+  rescue
+    error -> {:error, error}
+  end
+
+  @doc "Raising version of `insert/2..5`"
+  @spec insert!(Smokestack.t(), Resource.t(), atom, map, insert_options) ::
+          insert_result | no_return
+  def insert!(factory_module, resource, variant \\ :default, overrides \\ %{}, options \\ [])
+      when is_atom(factory_module) and is_atom(resource) and is_atom(variant) and
+             is_map(overrides) and is_list(options) do
+    with {:ok, factory} <- get_factory(factory_module, resource, variant),
+         {:ok, params} <- build_params(factory, overrides, options) do
+      resource
+      |> Seed.seed!(params)
+      |> Resource.put_metadata(:factory, factory_module)
+      |> Resource.put_metadata(:variant, variant)
+    else
       {:error, reason} -> raise reason
     end
   end
@@ -78,7 +121,7 @@ defmodule Smokestack.Builder do
 
   defp maybe_stringify_keys(attrs, options) do
     if Keyword.get(options, :keys, @param_option_defaults[:keys]) == :string do
-      Map.new(fn {key, value} -> {Atom.to_string(key), value} end)
+      Map.new(attrs, fn {key, value} -> {Atom.to_string(key), value} end)
     else
       attrs
     end
@@ -86,7 +129,7 @@ defmodule Smokestack.Builder do
 
   defp maybe_dasherise_keys(attrs, options) do
     if Keyword.get(options, :keys, @param_option_defaults[:keys]) == :dasherise do
-      Map.new(fn {key, value} ->
+      Map.new(attrs, fn {key, value} ->
         key =
           key
           |> Atom.to_string()
