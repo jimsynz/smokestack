@@ -5,12 +5,13 @@ defmodule Smokestack.Dsl.Attribute do
   See `d:Smokestack.factory.default.attribute` for more information.
   """
 
-  defstruct generator: nil, name: nil
+  defstruct __identifier__: nil, generator: nil, name: nil
 
   alias Ash.Resource
   alias Spark.Dsl.Entity
 
   @type t :: %__MODULE__{
+          __identifier__: nil,
           generator:
             mfa | (-> any) | (Resource.record() -> any) | (Resource.record(), keyword -> any),
           name: atom
@@ -24,6 +25,7 @@ defmodule Smokestack.Dsl.Attribute do
         name: :attribute,
         target: __MODULE__,
         args: [:name, :generator],
+        identifier: {:auto, :unique_integer},
         schema: [
           name: [
             type: :atom,

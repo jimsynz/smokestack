@@ -5,13 +5,14 @@ defmodule Smokestack.Dsl.Factory do
   See `d:Smokestack.factory` for more information.
   """
 
-  defstruct attributes: [], resource: nil, variant: :default
+  defstruct __identifier__: nil, attributes: [], resource: nil, variant: :default
 
   alias Ash.Resource
   alias Smokestack.Dsl.{Attribute, Template}
   alias Spark.Dsl.Entity
 
   @type t :: %__MODULE__{
+          __identifier__: any,
           attributes: [Attribute.t()],
           resource: Resource.t(),
           variant: atom
@@ -27,6 +28,7 @@ defmodule Smokestack.Dsl.Factory do
         target: __MODULE__,
         args: [:resource, {:optional, :variant, :default}],
         imports: [Template],
+        identifier: {:auto, :unique_integer},
         schema: [
           resource: [
             type: {:behaviour, Ash.Resource},
