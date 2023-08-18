@@ -95,6 +95,60 @@ defmodule Smokestack.Builder do
     end
   end
 
+  @doc """
+  Build a number of resources and insert them into their datalayer.
+  """
+  @spec insert_many(Smokestack.t(), Resource.t(), pos_integer, atom, insert_options) ::
+          {:ok, [insert_result]} | {:error, any}
+  def insert_many(factory_module, resource, count, variant \\ :default, options \\ [])
+      when is_atom(factory_module) and is_atom(resource) and is_integer(count) and count > 0 and
+             is_atom(variant) and is_list(options) do
+    with {:ok, factory} <- get_factory(factory_module, resource, variant),
+         {:ok, params_list} <- build_many_params(factory, count, options) do
+      records =
+        resource
+        |> Seed.seed!(params_list)
+        |> Enum.map(fn record ->
+          record
+          |> Resource.put_metadata(:factory, factory_module)
+          |> Resource.put_metadata(:variant, variant)
+        end)
+
+      {:ok, records}
+    end
+  rescue
+    error -> {:error, error}
+  end
+
+  @doc "Raising version of `insert_many/5`."
+  @spec insert_many!(Smokestack.t(), Resource.t(), pos_integer, atom, insert_options) ::
+          [insert_result] | no_return
+  def insert_many!(factory_module, resource, count, variant \\ :default, options \\ [])
+      when is_atom(factory_module) and is_atom(resource) and is_integer(count) and count > 0 and
+             is_atom(variant) and is_list(options) do
+    with {:ok, factory} <- get_factory(factory_module, resource, variant),
+         {:ok, params_list} <- build_many_params(factory, count, options) do
+      resource
+      |> Seed.seed!(params_list)
+      |> Enum.map(fn record ->
+        record
+        |> Resource.put_metadata(:factory, factory_module)
+        |> Resource.put_metadata(:variant, variant)
+      end)
+    else
+      {:error, reason} -> raise reason
+    end
+  end
+
+  defp build_many_params(factory, count, options) do
+    Enum.reduce_while(1..count, {:ok, []}, fn _, {:ok, params_list} ->
+      case build_params(factory, %{}, options) do
+        {:ok, params} -> {:cont, {:ok, [params | params_list]}}
+        {:error, reason} -> {:halt, {:error, reason}}
+      end
+    end)
+  end
+
   defp get_factory(factory_module, resource, variant) do
     with :error <- Info.factory(factory_module, resource, variant) do
       {:error,

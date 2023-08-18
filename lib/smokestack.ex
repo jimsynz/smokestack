@@ -64,6 +64,26 @@ defmodule Smokestack do
   @callback insert!(Resource.t(), map, atom, Builder.insert_options()) ::
               Resource.record() | no_return
 
+  @doc """
+  Runs a factory a number of times and returns a list of created records.
+
+  Automatically implemented by modules which `use Smokestack`.
+
+  See `Smokestack.Builder.insert_many/5` for more information.
+  """
+  @callback insert_many(Resource.t(), pos_integer, atom, Builder.insert_options()) ::
+              {:ok, [Resource.record()]} | {:error, any}
+
+  @doc """
+  Raising version of `insert_many/4`.
+
+  Automatically implemented by modules which `use Smokestack`.
+
+  See `Smokestack.Builder.insert_many/5` for more information.
+  """
+  @callback insert_many!(Resource.t(), pos_integer, atom, Builder.insert_options()) ::
+              [Resource.record()] | no_return
+
   @doc false
   defmacro __using__(opts) do
     [
@@ -110,7 +130,32 @@ defmodule Smokestack do
         def insert!(resource, overrides \\ %{}, variant \\ :default, options \\ []),
           do: Builder.insert!(__MODULE__, resource, overrides, variant, options)
 
-        defoverridable params: 4, params!: 4, insert: 4, insert!: 4
+        @doc """
+        Execute the matching factory a number of times and return a list of Ash Resource records.
+
+        See `Smokestack.Builder.insert_many/5` for more information.
+        """
+        @spec insert_many(Resource.t(), pos_integer, atom, Builder.insert_options()) ::
+                {:ok, [Resource.record()]} | {:error, any}
+        def insert_many(resource, count, variant \\ :default, options \\ []),
+          do: Builder.insert_many(__MODULE__, resource, count, variant, options)
+
+        @doc """
+        Raising version of `insert_many/4`.
+
+        See `Smokestack.Builder.insert_many/5` for more information.
+        """
+        @spec insert_many!(Resource.t(), pos_integer, atom, Builder.insert_options()) ::
+                [Resource.record()] | no_return
+        def insert_many!(resource, count, variant \\ :default, options \\ []),
+          do: Builder.insert_many!(__MODULE__, resource, count, variant, options)
+
+        defoverridable params: 4,
+                       params!: 4,
+                       insert: 4,
+                       insert!: 4,
+                       insert_many: 4,
+                       insert_many!: 4
       end
     ] ++ super(opts)
   end

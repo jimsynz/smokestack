@@ -45,4 +45,10 @@ defmodule Smokestack.BuilderTest do
       assert Enum.all?(record.tags, &is_struct(&1, Ash.CiString))
     end
   end
+
+  describe "insert_many/3..5" do
+    assert {:ok, records} = Builder.insert_many(Factory, Post, 3)
+    assert length(records) == 3
+    assert Enum.all?(records, &is_struct(&1, Post))
+  end
 end
