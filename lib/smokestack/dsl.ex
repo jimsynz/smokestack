@@ -5,7 +5,14 @@ defmodule Smokestack.Dsl do
   @section %Section{
     name: :smokestack,
     top_level?: true,
-    entities: Factory.__entities__()
+    entities: Factory.__entities__(),
+    schema: [
+      api: [
+        type: {:behaviour, Ash.Api},
+        required: false,
+        doc: "The default Ash API to use when evaluating loads"
+      ]
+    ]
   }
 
   @moduledoc """

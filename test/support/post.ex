@@ -39,4 +39,8 @@ defmodule Support.Post do
   actions do
     defaults [:create, :read, :update, :destroy]
   end
+
+  calculations do
+    calculate :full_title, :string, concat([:title, :sub_title], ": ")
+  end
 end
