@@ -5,6 +5,19 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.2.0](https://code.harton.nz/james/smokestack/compare/v0.1.1...v0.2.0) (2023-08-28)
+
+
+
+
+### Features:
+
+* handing building and loading relationships.
+
+### Improvements:
+
+* reduce arity of builder functions.
+
 ## [v0.1.1](https://code.harton.nz/james/smokestack/compare/v0.1.0...v0.1.1) (2023-08-18)
 
 
