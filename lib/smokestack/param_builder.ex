@@ -6,16 +6,22 @@ defmodule Smokestack.ParamBuilder do
   alias Ash.Resource
   alias Smokestack.{Dsl.Attribute, Dsl.Factory, Dsl.Info, Template}
 
-  @param_option_defaults [keys: :atom, as: :map, build: []]
+  @param_option_defaults %{keys: :atom, as: :map, build: [], attrs: %{}, variant: :default}
 
   @typedoc "Options that can be passed to `params/4`."
-  @type param_options :: [param_keys_option | param_as_option | build_option]
+  @type param_options :: [param_keys_option | param_as_option | build_option | param_variant]
 
   @typedoc "Key type in the result. Defaults to `#{inspect(@param_option_defaults[:keys])}`."
   @type param_keys_option :: {:keys, :atom | :string | :dasherise}
 
   @typedoc "Result type. Defaults to `#{inspect(@param_option_defaults[:as])}`"
   @type param_as_option :: {:as, :map | :list}
+
+  @typedoc "Choose a specific factory variant. Defaults to `:default`."
+  @type param_variant :: {:variant, atom}
+
+  @typedoc "Specify attribute overrides."
+  @type param_attrs :: {:attrs, Enumerable.t({atom, any})}
 
   @type param_result ::
           %{required(atom | String.t()) => any}
@@ -27,29 +33,28 @@ defmodule Smokestack.ParamBuilder do
   @doc """
   Build parameters for a resource with a factory.
   """
-  @spec build(Smokestack.t(), Resource.t(), map, atom, param_options) ::
-          {:ok, param_result} | {:error, any}
-  def build(factory_module, resource, overrides \\ %{}, variant \\ :default, options \\ [])
-      when is_atom(factory_module) and is_atom(resource) and is_atom(variant) and is_list(options) do
-    with {:ok, factory} <- Info.factory(factory_module, resource, variant) do
-      build_factory(factory, overrides, options)
+  @spec build(Smokestack.t(), Resource.t(), param_options) :: {:ok, param_result} | {:error, any}
+  def build(factory_module, resource, options \\ [])
+      when is_atom(factory_module) and is_atom(resource) and is_list(options) do
+    with {:ok, options} <- validate_options(options),
+         {:ok, factory} <- Info.factory(factory_module, resource, options[:variant]) do
+      build_factory(factory, options)
     end
   end
 
   @doc "Raising version of `build/2..5`."
-  @spec build!(Smokestack.t(), Resource.t(), map, atom, param_options) ::
-          param_result | no_return
-  def build!(factory_module, resource, overrides \\ %{}, variant \\ :default, options \\ []) do
-    case build(factory_module, resource, overrides, variant, options) do
+  @spec build!(Smokestack.t(), Resource.t(), param_options) :: param_result | no_return
+  def build!(factory_module, resource, options \\ []) do
+    case build(factory_module, resource, options) do
       {:ok, params} -> params
       {:error, reason} -> raise reason
     end
   end
 
   @doc false
-  @spec build_factory(Factory.t(), map, param_options) :: {:ok, param_result()} | {:error, any}
-  def build_factory(factory, overrides \\ %{}, options \\ []) do
-    with {:ok, params} <- build_params(factory, overrides, options) do
+  @spec build_factory(Factory.t(), param_options) :: {:ok, param_result()} | {:error, any}
+  def build_factory(factory, options \\ []) do
+    with {:ok, params} <- build_params(factory, options) do
       params =
         params
         |> maybe_stringify_keys(options)
@@ -60,7 +65,23 @@ defmodule Smokestack.ParamBuilder do
     end
   end
 
-  defp build_params(factory, overrides, options) do
+  @doc false
+  @spec validate_options(Enumerable.t({atom, any})) :: {:ok, param_options()}
+  def validate_options(options) do
+    opt_map = Map.new(options)
+
+    Enum.reduce(@param_option_defaults, {:ok, []}, fn
+      {key, _}, {:ok, options} when is_map_key(opt_map, key) ->
+        {:ok, [{key, Map.get(opt_map, key)} | options]}
+
+      {key, value}, {:ok, options} ->
+        {:ok, [{key, value} | options]}
+    end)
+  end
+
+  defp build_params(factory, options) do
+    overrides = Map.new(options[:attrs])
+
     factory
     |> Map.get(:attributes, [])
     |> Enum.filter(&is_struct(&1, Attribute))
@@ -111,7 +132,7 @@ defmodule Smokestack.ParamBuilder do
        when relationship.cardinality == :one do
     with {:ok, related_factory} <-
            find_related_factory(relationship.destination, factory),
-         {:ok, related_params} <- build_params(related_factory, %{}, options) do
+         {:ok, related_params} <- build_params(related_factory, Keyword.put(options, :attrs, %{})) do
       {:ok, Map.put(params, relationship.name, related_params)}
     end
   end
@@ -120,7 +141,7 @@ defmodule Smokestack.ParamBuilder do
        when relationship.cardinality == :many do
     with {:ok, related_factory} <-
            find_related_factory(relationship.destination, factory),
-         {:ok, related_params} <- build_params(related_factory, %{}, options) do
+         {:ok, related_params} <- build_params(related_factory, Keyword.put(options, :attrs, %{})) do
       {:ok, Map.put(params, relationship.name, [related_params])}
     end
   end

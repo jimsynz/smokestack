@@ -14,7 +14,7 @@ defmodule Smokestack.RecordBuilderTest do
 
     test "it can insert related records" do
       assert {:ok, record} =
-               RecordBuilder.build(Support.Factory, Support.Post, %{}, :default, build: [:author])
+               RecordBuilder.build(Support.Factory, Support.Post, build: [:author])
 
       assert record.__struct__ == Support.Post
       assert record.__meta__.state == :loaded
@@ -24,9 +24,7 @@ defmodule Smokestack.RecordBuilderTest do
 
     test "it can perform a load on a record" do
       assert {:ok, record} =
-               RecordBuilder.build(Support.Factory, Support.Post, %{}, :default,
-                 load: :full_title
-               )
+               RecordBuilder.build(Support.Factory, Support.Post, load: :full_title)
 
       assert record.__struct__ == Support.Post
       assert record.full_title =~ ":"

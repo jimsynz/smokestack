@@ -31,19 +31,19 @@ defmodule Smokestack do
 
   Automatically implemented by modules which `use Smokestack`.
 
-  See `Smokestack.ParamBuilder.build/5` for more information.
+  See `Smokestack.ParamBuilder.build/2` for more information.
   """
-  @callback params(Resource.t(), map, atom, ParamBuilder.param_options()) ::
+  @callback params(Resource.t(), ParamBuilder.param_options()) ::
               {:ok, ParamBuilder.param_result()} | {:error, any}
 
   @doc """
-  Raising version of `params/4`.
+  Raising version of `params/2`.
 
   Automatically implemented by modules which `use Smokestack`.
 
-  See `Smokestack.ParamBuilder.build/5` for more information.
+  See `Smokestack.ParamBuilder.build/3` for more information.
   """
-  @callback params!(Resource.t(), map, atom, ParamBuilder.param_options()) ::
+  @callback params!(Resource.t(), ParamBuilder.param_options()) ::
               ParamBuilder.param_result() | no_return
 
   @doc """
@@ -51,9 +51,9 @@ defmodule Smokestack do
 
   Automatically implemented by modules which `use Smokestack`.
 
-  See `Smokestack.RecordBuilder.build/5` for more information.
+  See `Smokestack.RecordBuilder.build/3` for more information.
   """
-  @callback insert(Resource.t(), map, atom, RecordBuilder.insert_options()) ::
+  @callback insert(Resource.t(), RecordBuilder.insert_options()) ::
               {:ok, Resource.record()} | {:error, any}
 
   @doc """
@@ -61,9 +61,9 @@ defmodule Smokestack do
 
   Automatically implemented by modules which `use Smokestack`.
 
-  See `Smokestack.RecordBuilder.build/5` for more information.
+  See `Smokestack.RecordBuilder.build/3` for more information.
   """
-  @callback insert!(Resource.t(), map, atom, RecordBuilder.insert_options()) ::
+  @callback insert!(Resource.t(), RecordBuilder.insert_options()) ::
               Resource.record() | no_return
 
   @doc false
@@ -75,47 +75,47 @@ defmodule Smokestack do
         @doc """
         Execute the matching factory and return a map or list of params.
 
-        See `Smokestack.ParamBuilder.build/5` for more information.
+        See `Smokestack.ParamBuilder.build/3` for more information.
         """
-        @spec params(Resource.t(), map, atom, ParamBuilder.param_options()) ::
+        @spec params(Resource.t(), ParamBuilder.param_options()) ::
                 {:ok, ParamBuilder.param_result()} | {:error, any}
-        def params(resource, overrides \\ %{}, variant \\ :default, options \\ []),
-          do: ParamBuilder.build(__MODULE__, resource, overrides, variant, options)
+        def params(resource, options \\ []),
+          do: ParamBuilder.build(__MODULE__, resource, options)
 
         @doc """
-        Raising version of `params/4`.
+        Raising version of `params/2`.
 
-        See `Smokestack.ParamBuilder.build/5` for more information.
+        See `Smokestack.ParamBuilder.build/3` for more information.
         """
-        @spec params!(Resource.t(), map, atom, ParamBuilder.param_options()) ::
+        @spec params!(Resource.t(), ParamBuilder.param_options()) ::
                 ParamBuilder.param_result() | no_return
-        def params!(resource, overrides \\ %{}, variant \\ :default, options \\ []),
-          do: ParamBuilder.build!(__MODULE__, resource, overrides, variant, options)
+        def params!(resource, options \\ []),
+          do: ParamBuilder.build!(__MODULE__, resource, options)
 
         @doc """
         Execute the matching factory and return an inserted Ash Resource record.
 
-        See `Smokestack.RecordBuilder.build/5` for more information.
+        See `Smokestack.RecordBuilder.build/3` for more information.
         """
-        @spec insert(Resource.t(), map, atom, RecordBuilder.insert_options()) ::
+        @spec insert(Resource.t(), RecordBuilder.insert_options()) ::
                 {:ok, Resource.record()} | {:error, any}
-        def insert(resource, overrides \\ %{}, variant \\ :default, options \\ []),
-          do: RecordBuilder.build(__MODULE__, resource, overrides, variant, options)
+        def insert(resource, options \\ []),
+          do: RecordBuilder.build(__MODULE__, resource, options)
 
         @doc """
-        Raising version of `insert/4`.
+        Raising version of `insert/2`.
 
-        See `Smokestack.RecordBuilder.build/5` for more information.
+        See `Smokestack.RecordBuilder.build/3` for more information.
         """
-        @spec insert!(Resource.t(), map, atom, RecordBuilder.insert_options()) ::
+        @spec insert!(Resource.t(), RecordBuilder.insert_options()) ::
                 Resource.record() | no_return
-        def insert!(resource, overrides \\ %{}, variant \\ :default, options \\ []),
-          do: RecordBuilder.build!(__MODULE__, resource, overrides, variant, options)
+        def insert!(resource, options \\ []),
+          do: RecordBuilder.build!(__MODULE__, resource, options)
 
-        defoverridable params: 4,
-                       params!: 4,
-                       insert: 4,
-                       insert!: 4
+        defoverridable params: 2,
+                       params!: 2,
+                       insert: 2,
+                       insert!: 2
       end
     ] ++ super(opts)
   end

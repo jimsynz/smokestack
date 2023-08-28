@@ -6,7 +6,7 @@ defmodule Smokestack.RecordBuilder do
   alias Ash.{Resource, Seed}
   alias Smokestack.{Dsl.Info, ParamBuilder}
 
-  @insert_option_defaults %{load: []}
+  @insert_option_defaults %{load: [], attrs: %{}, variant: :default}
 
   @type insert_options :: ParamBuilder.param_options() | [load_option()]
 
@@ -18,23 +18,23 @@ defmodule Smokestack.RecordBuilder do
   @doc """
   Insert a resource record with a factory.
   """
-  @spec build(Smokestack.t(), Resource.t(), map, atom, insert_options) ::
+  @spec build(Smokestack.t(), Resource.t(), insert_options) ::
           {:ok, insert_result()} | {:error, any}
-  def build(factory_module, resource, overrides \\ %{}, variant \\ :default, options \\ [])
-      when is_atom(factory_module) and is_atom(resource) and is_atom(variant) and is_list(options) do
+  def build(factory_module, resource, options \\ [])
+      when is_atom(factory_module) and is_atom(resource) and is_list(options) do
     with {:ok, insert_opts, param_opts} <- split_options(options),
-         {:ok, factory} <- Info.factory(factory_module, resource, variant),
-         {:ok, params} <- ParamBuilder.build_factory(factory, overrides, param_opts),
-         {:ok, record} <- do_seed(resource, params, factory_module, variant) do
+         {:ok, factory} <- Info.factory(factory_module, resource, insert_opts[:variant]),
+         {:ok, params} <- ParamBuilder.build_factory(factory, param_opts),
+         {:ok, record} <- do_seed(resource, params, factory_module, insert_opts[:variant]) do
       maybe_load(factory, record, insert_opts)
     end
   end
 
-  @doc "Raising version of `build/5`"
-  @spec build!(Smokestack.t(), Resource.t(), map, atom, insert_options) ::
+  @doc "Raising version of `build/3`"
+  @spec build!(Smokestack.t(), Resource.t(), insert_options) ::
           insert_result() | no_return
-  def build!(factory_module, resource, overrides \\ %{}, variant \\ :default, options \\ []) do
-    case build(factory_module, resource, overrides, variant, options) do
+  def build!(factory_module, resource, options \\ []) do
+    case build(factory_module, resource, options) do
       {:ok, params} -> params
       {:error, reason} -> raise reason
     end
@@ -69,20 +69,21 @@ defmodule Smokestack.RecordBuilder do
   end
 
   defp split_options(options) do
-    {defaults, iopts, popts} =
-      options
-      |> Enum.reduce({@insert_option_defaults, [], []}, fn
-        {key, value}, {defaults, iopts, popts} when is_map_key(defaults, key) ->
-          {Map.delete(defaults, key), [{key, value} | iopts], popts}
+    with {:ok, param_options} <- ParamBuilder.validate_options(options),
+         {:ok, insert_options} <- validate_options(options) do
+      {:ok, insert_options, param_options}
+    end
+  end
 
-        {key, value}, {defaults, iopts, popts} ->
-          {defaults, iopts, [{key, value} | popts]}
-      end)
+  defp validate_options(options) do
+    opt_map = Map.new(options)
 
-    iopts =
-      iopts
-      |> Enum.concat(defaults)
+    Enum.reduce(@insert_option_defaults, {:ok, []}, fn
+      {key, _}, {:ok, options} when is_map_key(opt_map, key) ->
+        {:ok, [{key, Map.get(opt_map, key)} | options]}
 
-    {:ok, iopts, popts}
+      {key, value}, {:ok, options} ->
+        {:ok, [{key, value} | options]}
+    end)
   end
 end

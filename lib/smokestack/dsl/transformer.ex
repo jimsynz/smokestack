@@ -1,8 +1,8 @@
 defmodule Smokestack.Dsl.Transformer do
   @moduledoc false
 
-  alias Spark.{Dsl, Dsl.Transformer, Error.DslError}
   alias Smokestack.Dsl.Factory
+  alias Spark.{Dsl, Dsl.Transformer, Error.DslError}
   use Transformer
 
   @doc false
