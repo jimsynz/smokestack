@@ -5,7 +5,12 @@ defmodule Smokestack.Dsl.Factory do
   See `d:Smokestack.factory` for more information.
   """
 
-  defstruct __identifier__: nil, attributes: [], resource: nil, variant: :default
+  defstruct __identifier__: nil,
+            api: nil,
+            attributes: [],
+            module: nil,
+            resource: nil,
+            variant: :default
 
   alias Ash.Resource
   alias Smokestack.Dsl.{Attribute, Template}
@@ -13,8 +18,10 @@ defmodule Smokestack.Dsl.Factory do
 
   @type t :: %__MODULE__{
           __identifier__: any,
+          api: nil,
           attributes: [Attribute.t()],
           resource: Resource.t(),
+          module: module,
           variant: atom
         }
 
@@ -30,6 +37,11 @@ defmodule Smokestack.Dsl.Factory do
         imports: [Template],
         identifier: {:auto, :unique_integer},
         schema: [
+          api: [
+            type: {:behaviour, Ash.Api},
+            required: false,
+            doc: "The Ash API to use when evaluating loads"
+          ],
           resource: [
             type: {:behaviour, Ash.Resource},
             required: true,

@@ -10,14 +10,20 @@ defmodule Smokestack.Dsl.Info do
   @doc """
   Retrieve a variant for a specific resource.
   """
-  @spec factory(Smokestack.t(), Resource.t(), atom) :: {:ok, Factory.t()} | :error
+  @spec factory(Smokestack.t(), Resource.t(), atom) :: {:ok, Factory.t()} | {:error, any}
   def factory(factory, resource, variant) do
     factory
     |> Extension.get_entities([:smokestack])
     |> Enum.find(&(is_struct(&1, Factory) && &1.resource == resource && &1.variant == variant))
     |> case do
-      nil -> :error
-      factory -> {:ok, factory}
+      nil ->
+        {:error,
+         ArgumentError.exception(
+           message: "Factory for `#{inspect(resource)}` variant `#{inspect(variant)}` not found."
+         )}
+
+      factory ->
+        {:ok, factory}
     end
   end
 end

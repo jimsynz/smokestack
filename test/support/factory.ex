@@ -20,6 +20,8 @@ defmodule Support.Factory do
   end
 
   factory Support.Post do
+    api Support.Api
+
     attribute :title, &Faker.Commerce.product_name/0
     attribute :tags, n_times(3..20, &Faker.Lorem.word/0)
     attribute :body, &Faker.Markdown.markdown/0

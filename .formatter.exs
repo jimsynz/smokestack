@@ -1,4 +1,11 @@
-spark_locals_without_parens = [attribute: 2, attribute: 3, factory: 1, factory: 2, factory: 3]
+spark_locals_without_parens = [
+  api: 1,
+  attribute: 2,
+  attribute: 3,
+  factory: 1,
+  factory: 2,
+  factory: 3
+]
 
 [
   import_deps: [:ash, :spark],
