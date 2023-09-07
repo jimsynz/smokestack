@@ -10,7 +10,8 @@ defmodule Smokestack.Dsl.Info do
   @doc """
   Retrieve a variant for a specific resource.
   """
-  @spec factory(Smokestack.t(), Resource.t(), atom) :: {:ok, Factory.t()} | {:error, any}
+  @spec factory(Smokestack.t(), Resource.t(), atom) ::
+          {:ok, Factory.t()} | {:error, Exception.t()}
   def factory(factory, resource, variant) do
     factory
     |> Extension.get_entities([:smokestack])

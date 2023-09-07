@@ -20,21 +20,29 @@ defmodule Smokestack do
 
   use Dsl, default_extensions: [extensions: [Smokestack.Dsl]]
   alias Ash.Resource
-  alias Smokestack.{ParamBuilder, RecordBuilder}
+  alias Smokestack.{Builder, Dsl.Info, ParamBuilder, RecordBuilder}
 
   @type t :: module
 
   @type recursive_atom_list :: atom | [atom | {atom, recursive_atom_list()}]
+  @type param_option :: variant_option | ParamBuilder.option()
+  @type insert_option :: variant_option | RecordBuilder.option()
+
+  @typedoc """
+  Choose a factory variant to use.  Defaults to `:default`.
+  """
+  @type variant_option :: {:variant, atom}
 
   @doc """
-  Runs a factory and uses it to build a map or list of results.
+  Runs a factory and uses it to build a parameters suitable for simulating a
+  request.
 
   Automatically implemented by modules which `use Smokestack`.
 
   See `Smokestack.ParamBuilder.build/2` for more information.
   """
-  @callback params(Resource.t(), ParamBuilder.param_options()) ::
-              {:ok, ParamBuilder.param_result()} | {:error, any}
+  @callback params(Resource.t(), [param_option]) ::
+              {:ok, ParamBuilder.result()} | {:error, any}
 
   @doc """
   Raising version of `params/2`.
@@ -43,18 +51,17 @@ defmodule Smokestack do
 
   See `Smokestack.ParamBuilder.build/3` for more information.
   """
-  @callback params!(Resource.t(), ParamBuilder.param_options()) ::
-              ParamBuilder.param_result() | no_return
+  @callback params!(Resource.t(), [param_option]) :: ParamBuilder.result() | no_return
 
   @doc """
-  Runs a factory and uses it to insert an Ash Resource into it's data layer.
+  Runs a factory and uses it to insert Ash resources into their data layers.
 
   Automatically implemented by modules which `use Smokestack`.
 
   See `Smokestack.RecordBuilder.build/3` for more information.
   """
-  @callback insert(Resource.t(), RecordBuilder.insert_options()) ::
-              {:ok, Resource.record()} | {:error, any}
+  @callback insert(Resource.t(), [insert_option]) ::
+              {:ok, RecordBuilder.result()} | {:error, any}
 
   @doc """
   Raising version of `insert/4`.
@@ -63,8 +70,7 @@ defmodule Smokestack do
 
   See `Smokestack.RecordBuilder.build/3` for more information.
   """
-  @callback insert!(Resource.t(), RecordBuilder.insert_options()) ::
-              Resource.record() | no_return
+  @callback insert!(Resource.t(), [insert_option]) :: RecordBuilder.result() | no_return
 
   @doc false
   defmacro __using__(opts) do
@@ -73,44 +79,63 @@ defmodule Smokestack do
         @behaviour Smokestack
 
         @doc """
-        Execute the matching factory and return a map or list of params.
+        Runs a factory and uses it to build a parameters suitable for simulating a
+        request.
 
-        See `Smokestack.ParamBuilder.build/3` for more information.
+        See `c:Smokestack.build/2` for more information.
         """
-        @spec params(Resource.t(), ParamBuilder.param_options()) ::
-                {:ok, ParamBuilder.param_result()} | {:error, any}
-        def params(resource, options \\ []),
-          do: ParamBuilder.build(__MODULE__, resource, options)
+        @spec params(Resource.t(), [Smokestack.param_option()]) ::
+                {:ok, ParamBuilder.result()} | {:error, any}
+        def params(resource, options \\ []) do
+          {variant, options} = Keyword.pop(options, :variant, :default)
+
+          with {:ok, factory} <- Info.factory(__MODULE__, resource, variant) do
+            Builder.build(ParamBuilder, factory, options)
+          end
+        end
 
         @doc """
         Raising version of `params/2`.
 
-        See `Smokestack.ParamBuilder.build/3` for more information.
+        See `c:Smokestack.build/3` for more information.
         """
-        @spec params!(Resource.t(), ParamBuilder.param_options()) ::
-                ParamBuilder.param_result() | no_return
-        def params!(resource, options \\ []),
-          do: ParamBuilder.build!(__MODULE__, resource, options)
+        @spec params!(Resource.t(), [Smokestack.param_option()]) ::
+                ParamBuilder.result() | no_return
+        def params!(resource, options \\ []) do
+          case params(resource, options) do
+            {:ok, result} -> result
+            {:error, reason} -> raise reason
+          end
+        end
 
         @doc """
         Execute the matching factory and return an inserted Ash Resource record.
 
-        See `Smokestack.RecordBuilder.build/3` for more information.
+        See `c:Smokestack.insert/2` for more information.
         """
-        @spec insert(Resource.t(), RecordBuilder.insert_options()) ::
-                {:ok, Resource.record()} | {:error, any}
-        def insert(resource, options \\ []),
-          do: RecordBuilder.build(__MODULE__, resource, options)
+        @spec insert(Resource.t(), [Smokestack.insert_option()]) ::
+                {:ok, RecordBuilder.result()} | {:error, any}
+        def insert(resource, options \\ []) do
+          {variant, options} = Keyword.pop(options, :variant, :default)
+
+          with {:ok, factory} <- Info.factory(__MODULE__, resource, variant) do
+            Builder.build(RecordBuilder, factory, options)
+          end
+        end
 
         @doc """
         Raising version of `insert/2`.
 
-        See `Smokestack.RecordBuilder.build/3` for more information.
+        See `c:Smokestack.insert/2` for more information.
         """
-        @spec insert!(Resource.t(), RecordBuilder.insert_options()) ::
-                Resource.record() | no_return
-        def insert!(resource, options \\ []),
-          do: RecordBuilder.build!(__MODULE__, resource, options)
+        @spec insert!(Resource.t(), [Smokestack.insert_option()]) ::
+                RecordBuilder.result() | no_return
+        def insert!(resource, options \\ []) do
+          case insert(resource, options) do
+            {:ok, result} -> result
+            {:error, reason} -> raise reason
+          end
+        end
 
         defoverridable params: 2,
                        params!: 2,

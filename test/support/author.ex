@@ -25,4 +25,8 @@ defmodule Support.Author do
   actions do
     defaults [:create, :read, :update, :destroy]
   end
+
+  aggregates do
+    count :count_of_posts, :posts
+  end
 end

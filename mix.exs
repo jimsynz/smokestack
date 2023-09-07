@@ -47,7 +47,6 @@ defmodule Smokestack.MixProject do
 
     [
       {:ash, "~> 2.13"},
-      {:spark, "~> 1.1"},
       {:credo, "~> 1.7", opts},
       {:dialyxir, "~> 1.3", opts},
       {:doctor, "~> 0.21", opts},
@@ -56,7 +55,9 @@ defmodule Smokestack.MixProject do
       {:ex_doc, ">= 0.0.0", opts},
       {:faker, "~> 0.17", opts},
       {:git_ops, "~> 2.6", opts},
-      {:mix_audit, "~> 2.1", opts}
+      {:mix_audit, "~> 2.1", opts},
+      {:recase, "~> 0.7"},
+      {:spark, "~> 1.1"}
     ]
   end
 
