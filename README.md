@@ -25,7 +25,7 @@ defmodule MyApp.CharacterTest do
   use MyApp.Factory
 
   test "it can build a character" do
-    assert character = MyApp.Factory.build!(Character)
+    assert character = insert!(Character)
   end
 end
 ```
@@ -43,7 +43,15 @@ def deps do
 end
 ```
 
-Since the package hasn't been published, there are no docs available on [HexDocs](https://hexdocs.pm/), but you can access the latest version [here](https://docs.harton.nz/james/smokestack).
+Since the package hasn't been published, there are no docs available on 
+[HexDocs](https://hexdocs.pm/), but you can access the latest version 
+[here](https://docs.harton.nz/james/smokestack).
+
+## Github Mirror
+
+This repository is mirrored [on Github](https://github.com/jimsynz/smokestack)
+from it's primary location [on my Forejo instance](https://code.harton.nz/james/smokestack).
+Feel free to raise issues and open PRs on Github.
 
 ## License
 

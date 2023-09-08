@@ -2,6 +2,88 @@ defmodule Smokestack do
   alias Spark.{Dsl, Dsl.Extension}
 
   @moduledoc """
+  Smokestack provides a way to define test factories for your 
+  [Ash Resources](https://ash-hq.org/docs/module/ash/latest/ash-resource) 
+  using a convenient DSL:
+
+  ```
+  defmodule MyApp.Factory do
+    use Smokestack
+
+    factory Character do
+      attribute :name, &Faker.StarWars.character/0
+      attribute :affiliation, choose(["Galactic Empire", "Rebel Alliance"])
+    end
+  end
+
+  defmodule MyApp.CharacterTest do
+    use MyApp.DataCase
+    use MyApp.Factory
+
+    test "it can build a character" do
+      assert character = insert!(Character)
+    end
+  end
+  ```
+
+  ## Variants
+
+  Sometimes you need to make slightly different factories to build a resource
+  in a specific state for your test scenario.  
+
+  Here's an example defining an alternate `:trek` variant for the character
+  factory defined above:
+
+  ```
+  factory Character, :trek do
+    attribute :name, choose(["J.L. Pipes", "Severn", "Slickback"])
+    attribute :affiliation, choose(["Entrepreneur", "Voyager"])
+  end
+  ```
+
+  ## Building resource records
+
+  You can use `insert/2` and `insert!/2` to build and insert records.  Records
+  are inserted using `Ash.Seed.seed/2`, which means that they bypass the usual
+  Ash lifecycle (actions, validations, etc).
+
+  ### Options
+
+  - `load`: an atom, list of atoms or keyword list of the same listing 
+    relationships, calculations and aggregates that should be loaded
+    after the record is created.
+  - `count`: rather than inserting just a single record, you can specify a
+    number of records to be inserted.  A list of records will be returned.
+  - `build`: an atom, list of atoms or keyword list of the same describing
+    relationships which you would like built alongside the record.  If the
+    related resource has a variant which matches the current one, it will be
+    used, and if not the `:default` variant will be.
+  - `attrs`: A map or keyword list of attributes you would like to set directly
+    on the created record, rather than using the value provided by the factory.
+
+  ## Building parameters
+
+  As well as inserting records directly you can use `params/2` and `params!/2`
+  to build parameters for use testing controller actions, HTTP requests, etc.
+
+  ### Options
+
+  - `encode`: rather than returning a map or maps, provide an encoder module
+    to serialise the parameters.  Commonly you would use `Jason` or `Poison`.
+  - `nest`: rather than returning a map or maps directly, wrap the result in
+    an outer map using the provided key.
+  - `key_case`: change the case of the keys into one of the many cases
+    supported by [recase](https://hex.pm/packages/recase).
+  - `key_type`: specify whether the returned map or maps should use string or
+    atom keys (ignored when using the `encode` option).
+  - `count`: rather than returning just a single map, you can specify a
+    number of results to be returned.  A list of maps will be returned.
+  - `build`: an atom, list of atoms or keyword list of the same describing
+    relationships which you would like built within the result.  If the
+    related resource has a variant which matches the current one, it will be
+    used, and if not the `:default` variant will be.
+  - `attrs`: A map or keyword list of attributes you would like to set directly
+    on the result, rather than using the value provided by the factory.
 
   <!--- ash-hq-hide-start --> <!--- -->
 
@@ -137,10 +219,17 @@ defmodule Smokestack do
           end
         end
 
+        defmacro __using__(_) do
+          quote do
+            import __MODULE__
+          end
+        end
+
         defoverridable params: 2,
                        params!: 2,
                        insert: 2,
-                       insert!: 2
+                       insert!: 2,
+                       __using__: 1
       end
     ] ++ super(opts)
   end
