@@ -355,26 +355,25 @@ steps:
   - mc mirror --overwrite doc/ store/docs.harton.nz/$${DRONE_REPO}/$${DRONE_TAG}
   - mc mirror --overwrite doc/ store/docs.harton.nz/$${DRONE_REPO}
 
-# - name: hex release
-#   image: code.harton.nz/james/asdf_container:latest
-#   pull: "always"
-# when:
-#   event:
-#   - tag
-#   refs:
-#     include:
-#     - refs/tags/v*
-#   depends_on:
-#   - build artifacts
-#   environment:
-#     MIX_ENV: test
-#     HEX_HOME: /drone/src/.hex
-#     MIX_HOME: /drone/src/.mix
-#     REBAR_BASE_DIR: /drone/src/.rebar3
-#     ASDF_DATA_DIR: /drone/src/.asdf
-#     ASDF_DIR: /root/.asdf
-#     HEX_API_KEY:
-#       from_secret: HEX_API_KEY
-#   commands:
-#     - . $ASDF_DIR/asdf.sh
-#     - mix hex.publish --yes
+- name: hex release
+  image: code.harton.nz/james/asdf_container:latest
+  when:
+    event:
+    - tag
+    refs:
+      include:
+      - refs/tags/v*
+    depends_on:
+    - build artifacts
+    environment:
+      MIX_ENV: test
+      HEX_HOME: /drone/src/.hex
+      MIX_HOME: /drone/src/.mix
+      REBAR_BASE_DIR: /drone/src/.rebar3
+      ASDF_DATA_DIR: /drone/src/.asdf
+      ASDF_DIR: /root/.asdf
+      HEX_API_KEY:
+        from_secret: HEX_API_KEY
+    commands:
+      - . $ASDF_DIR/asdf.sh
+      - mix hex.publish --yes
