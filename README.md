@@ -32,20 +32,18 @@ end
 
 ## Installation
 
-Smokestack is not yet ready to be published to [Hex](https://hex.pm) so in the
-mean time if you want to try it you need to add a git-based dependency:
+Smokestack is available on [Hex](https://hex.pm/packages/smokestack) you can
+add it directly to your `mix.exs`:
 
 ```elixir
 def deps do
   [
-    {:smokestack, git: "https://code.harton.nz/cinder/cinder", tag: "v0.1.0"}
+    {:smokestack, "~> 0.3"},
   ]
 end
 ```
 
-Since the package hasn't been published, there are no docs available on 
-[HexDocs](https://hexdocs.pm/), but you can access the latest version 
-[here](https://docs.harton.nz/james/smokestack).
+Documentation for the latest release is available on [HexDocs](http://hexdocs.pm/smokestack).
 
 ## Github Mirror
 

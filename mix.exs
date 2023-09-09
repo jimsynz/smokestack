@@ -21,7 +21,10 @@ defmodule Smokestack.MixProject do
       source_url: "https://code.harton.nz/james/smokestack",
       homepage_url: "https://code.harton.nz/james/smokestack",
       aliases: aliases(),
-      dialyzer: [plt_add_apps: [:faker]]
+      dialyzer: [plt_add_apps: [:faker]],
+      docs: [
+        main: "Smokestack"
+      ]
     ]
   end
 
