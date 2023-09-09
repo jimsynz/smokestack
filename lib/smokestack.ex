@@ -26,6 +26,14 @@ defmodule Smokestack do
   end
   ```
 
+  ## Templates
+
+  Each attribute uses a template to generate a value when building a factory.  
+  Templates can be anything that implements the `Smokestack.Template` protocol.
+  This protocol is automatically implemented for functions with arities zero
+  through two - meaning you can just drop in your own functions - or use one of
+  the built-in helpers from `Smokestack.Dsl.Template`.
+
   ## Variants
 
   Sometimes you need to make slightly different factories to build a resource
