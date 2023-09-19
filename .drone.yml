@@ -243,6 +243,9 @@ steps:
   when:
     branch: 
     - main
+    event:
+      exclude:
+      - pull_request
   depends_on:
   - mix test
   - mix credo
