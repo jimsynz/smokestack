@@ -18,6 +18,13 @@ defmodule Smokestack.Dsl.Template do
     do: %Template.Choose{options: options, mapper: mapper}
 
   @doc """
+  Select a constant value
+  """
+  @spec constant(element, mapper) :: Template.t()
+  def constant(value, mapper \\ nil) when is_mapper(mapper),
+    do: %Template.Constant{value: value, mapper: mapper}
+
+  @doc """
   Cycle sequentially between a list of options.
   """
   @spec cycle(Enumerable.t(element), mapper) :: Template.t()
