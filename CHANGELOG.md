@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.4.0](https://code.harton.nz/james/smokestack/compare/v0.3.1...v0.4.0) (2023-09-19)
+
+
+
+
+### Features:
+
+* add template for constant values
+
 ## [v0.3.1](https://code.harton.nz/james/smokestack/compare/v0.3.0...v0.3.1) (2023-09-09)
 
 
