@@ -8,7 +8,7 @@ defmodule Smokestack.Template.Constant do
     def init(constant), do: constant
 
     def generate(constant, _, _) when is_function(constant.mapper, 1),
-      do: constant.mapper(constant.value)
+      do: constant.mapper.(constant.value)
 
     def generate(constant, _, _),
       do: constant.value
