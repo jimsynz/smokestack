@@ -265,6 +265,7 @@ steps:
   - mix hex.audit
   - mix format
   - mix spark.formatter
+  - mix spark.cheat_sheets
   - mix deps.unlock
   - mix doctor
   - mix git_ops.check_message
@@ -306,6 +307,7 @@ steps:
   - mix hex.audit
   - mix format
   - mix spark.formatter
+  - mix spark.cheat_sheets
   - mix deps.unlock
   - mix doctor
   - mix git_ops.check_message
