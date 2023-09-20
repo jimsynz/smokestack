@@ -32,32 +32,72 @@ defmodule Smokestack.RelatedBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
   def option_schema(factory) do
     with {:ok, factory_schema} <- FactoryBuilder.option_schema(factory) do
-      relationship_names =
-        factory.resource
-        |> Resource.Info.relationships()
-        |> Enum.map(& &1.name)
+      build_type =
+        if factory do
+          relationship_names =
+            factory.resource
+            |> Resource.Info.relationships()
+            |> Enum.map(& &1.name)
 
-      schema = [
-        build: [
-          type:
-            {:or,
-             [
-               {:wrap_list, {:in, relationship_names}},
-               {:keyword_list,
-                Enum.map(
-                  relationship_names,
-                  &{&1, type: {:or, [:atom, :keyword_list]}, required: false}
-                )}
-             ]},
-          required: false,
-          default: []
+          {:or,
+           [
+             {:wrap_list, {:in, relationship_names}},
+             {:keyword_list,
+              Enum.map(
+                relationship_names,
+                &{&1, type: {:or, [:atom, :keyword_list]}, required: false}
+              )}
+           ]}
+        else
+          {:or, [{:wrap_list, :atom}, :keyword_list]}
+        end
+
+      schema =
+        [
+          build: [
+            type: build_type,
+            required: false,
+            default: [],
+            doc: """
+            A (nested) list of relationships to build.
+
+            A (possibly nested) list of Ash resource relationships which is
+            traversed building any instances as needed.
+
+            For example:
+
+            ```elixir
+            post = insert!(Post, build: Author)
+            assert is_struct(post.author, Author)
+            ```
+
+            Caveats:
+            - When building for a variant other than `:default` a matching
+              variant factory will be looked for and used if present, otherwise
+              it will build the default variant instead.
+
+            - Note that for relationships whose cardinality is "many" we only
+              build one instance.
+
+            If these caveats are an issue, then you can build them yourself and
+            pass them in using the `attrs` option.
+
+            For example:
+
+            ```elixir
+            posts = insert!(Post, count: 3)
+            author = insert(Author, posts: posts)
+            ```
+
+            """
+          ]
         ]
-      ]
+        |> OptionsHelpers.merge_schemas(factory_schema, "Options for building instances")
 
-      {:ok, Keyword.merge(factory_schema, schema)}
+      {:ok, schema}
     end
   end
 

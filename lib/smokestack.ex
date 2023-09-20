@@ -2,8 +2,8 @@ defmodule Smokestack do
   alias Spark.{Dsl, Dsl.Extension}
 
   @moduledoc """
-  Smokestack provides a way to define test factories for your 
-  [Ash Resources](https://ash-hq.org/docs/module/ash/latest/ash-resource) 
+  Smokestack provides a way to define test factories for your
+  [Ash Resources](https://ash-hq.org/docs/module/ash/latest/ash-resource)
   using a convenient DSL:
 
   ```
@@ -28,7 +28,7 @@ defmodule Smokestack do
 
   ## Templates
 
-  Each attribute uses a template to generate a value when building a factory.  
+  Each attribute uses a template to generate a value when building a factory.
   Templates can be anything that implements the `Smokestack.Template` protocol.
   This protocol is automatically implemented for functions with arities zero
   through two - meaning you can just drop in your own functions - or use one of
@@ -37,7 +37,7 @@ defmodule Smokestack do
   ## Variants
 
   Sometimes you need to make slightly different factories to build a resource
-  in a specific state for your test scenario.  
+  in a specific state for your test scenario.
 
   Here's an example defining an alternate `:trek` variant for the character
   factory defined above:
@@ -57,7 +57,7 @@ defmodule Smokestack do
 
   ### Options
 
-  - `load`: an atom, list of atoms or keyword list of the same listing 
+  - `load`: an atom, list of atoms or keyword list of the same listing
     relationships, calculations and aggregates that should be loaded
     after the record is created.
   - `count`: rather than inserting just a single record, you can specify a
@@ -129,17 +129,21 @@ defmodule Smokestack do
 
   Automatically implemented by modules which `use Smokestack`.
 
-  See `Smokestack.ParamBuilder.build/2` for more information.
+  ## Options
+
+  #{Builder.docs(ParamBuilder, nil)}
   """
   @callback params(Resource.t(), [param_option]) ::
               {:ok, ParamBuilder.result()} | {:error, any}
 
   @doc """
-  Raising version of `params/2`.
+  Raising version of `c:params/2`.
 
   Automatically implemented by modules which `use Smokestack`.
 
-  See `Smokestack.ParamBuilder.build/3` for more information.
+  ## Options
+
+  #{Builder.docs(ParamBuilder, nil)}
   """
   @callback params!(Resource.t(), [param_option]) :: ParamBuilder.result() | no_return
 
@@ -148,17 +152,21 @@ defmodule Smokestack do
 
   Automatically implemented by modules which `use Smokestack`.
 
-  See `Smokestack.RecordBuilder.build/3` for more information.
+  ## Options
+
+  #{Builder.docs(RecordBuilder, nil)}
   """
   @callback insert(Resource.t(), [insert_option]) ::
               {:ok, RecordBuilder.result()} | {:error, any}
 
   @doc """
-  Raising version of `insert/4`.
+  Raising version of `c:insert/2`.
 
   Automatically implemented by modules which `use Smokestack`.
 
-  See `Smokestack.RecordBuilder.build/3` for more information.
+  ## Options
+
+  #{Builder.docs(RecordBuilder, nil)}
   """
   @callback insert!(Resource.t(), [insert_option]) :: RecordBuilder.result() | no_return
 
@@ -168,11 +176,20 @@ defmodule Smokestack do
       quote do
         @behaviour Smokestack
 
+        @moduledoc @moduledoc ||
+                     """
+                     A Smokestack factory.
+
+                     See `Smokestack` for more information.
+                     """
+
         @doc """
         Runs a factory and uses it to build a parameters suitable for simulating a
         request.
 
-        See `c:Smokestack.build/2` for more information.
+        ## Options
+
+        #{Builder.docs(ParamBuilder, nil)}
         """
         @spec params(Resource.t(), [Smokestack.param_option()]) ::
                 {:ok, ParamBuilder.result()} | {:error, any}
@@ -187,7 +204,9 @@ defmodule Smokestack do
         @doc """
         Raising version of `params/2`.
 
-        See `c:Smokestack.build/3` for more information.
+        ## Options
+
+        #{Builder.docs(ParamBuilder, nil)}
         """
         @spec params!(Resource.t(), [Smokestack.param_option()]) ::
                 ParamBuilder.result() | no_return
@@ -201,7 +220,9 @@ defmodule Smokestack do
         @doc """
         Execute the matching factory and return an inserted Ash Resource record.
 
-        See `c:Smokestack.insert/2` for more information.
+        ## Options
+
+        #{Builder.docs(RecordBuilder, nil)}
         """
         @spec insert(Resource.t(), [Smokestack.insert_option()]) ::
                 {:ok, RecordBuilder.result()} | {:error, any}
@@ -216,7 +237,9 @@ defmodule Smokestack do
         @doc """
         Raising version of `insert/2`.
 
-        See `c:Smokestack.insert/2` for more information.
+        ## Options
+
+        #{Builder.docs(RecordBuilder, nil)}
         """
         @spec insert!(Resource.t(), [Smokestack.insert_option()]) ::
                 RecordBuilder.result() | no_return

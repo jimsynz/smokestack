@@ -198,6 +198,19 @@ steps:
   commands:
   - asdf mix spark.formatter --check
 
+- name: mix spark.cheat_sheets
+  image: code.harton.nz/james/asdf_container:latest
+  environment:
+    MIX_ENV: test
+    HEX_HOME: /drone/src/.hex
+    MIX_HOME: /drone/src/.mix
+    REBAR_BASE_DIR: /drone/src/.rebar3
+    ASDF_DATA_DIR: /drone/src/.asdf
+  depends_on:
+  - mix compile
+  commands:
+  - asdf mix spark.cheat_sheets --check
+
 - name: mix deps.unlock
   image: code.harton.nz/james/asdf_container:latest
   environment:
@@ -241,7 +254,7 @@ steps:
 - name: mix git_ops.release
   image: code.harton.nz/james/asdf_container:latest
   when:
-    branch: 
+    branch:
     - main
     event:
       exclude:

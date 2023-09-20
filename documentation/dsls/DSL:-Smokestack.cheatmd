@@ -1,0 +1,153 @@
+# DSL: Smokestack.Dsl
+
+The DSL definition for the Smokestack DSL.
+
+<!--- ash-hq-hide-start --> <!--- -->
+
+## DSL Documentation
+
+### Index
+
+  * smokestack
+    * factory
+      * attribute
+
+### Docs
+
+## smokestack
+
+
+
+ * [factory](#module-factory)
+   * attribute
+
+
+
+
+
+---
+
+* `:api` (`t:atom/0`) - The default Ash API to use when evaluating loads
+
+
+
+### factory
+
+Define factories for a resource
+
+    * attribute
+
+
+
+* `:api` (`t:atom/0`) - The Ash API to use when evaluating loads
+
+* `:resource` (`t:atom/0`) - Required. An Ash Resource
+
+* `:variant` (`t:atom/0`) - The name of a factory variant The default value is `:default`.
+
+
+
+##### attribute
+
+
+
+
+
+
+
+* `:name` (`t:atom/0`) - Required. The name of the target attribute
+
+* `:generator` - Required. A function which can generate an appropriate value for the attribute.œ
+
+
+
+
+
+
+
+
+
+
+<!--- ash-hq-hide-stop --> <!--- -->
+
+
+## smokestack
+
+
+### Nested DSLs
+ * [factory](#smokestack-factory)
+   * attribute
+
+
+
+
+
+### Options
+| Name | Type | Default | Docs |
+| ---  | ---  | ---     | ---  |
+| `api` | `module` |  | The default Ash API to use when evaluating loads |
+
+
+
+## smokestack.factory
+```elixir
+factory resource, variant \ :default
+```
+
+
+Define factories for a resource
+
+### Nested DSLs
+ * [attribute](#smokestack-factory-attribute)
+
+
+
+
+### Arguments
+| Name | Type | Default | Docs |
+| ---  | ---  | ---     | ---  |
+| `resource`* | `module` |  | An Ash Resource |
+| `variant` | `atom` | `:default` | The name of a factory variant |
+### Options
+| Name | Type | Default | Docs |
+| ---  | ---  | ---     | ---  |
+| `api` | `module` |  | The Ash API to use when evaluating loads |
+
+
+## smokestack.factory.attribute
+```elixir
+attribute name, generator
+```
+
+
+
+
+
+
+
+
+### Arguments
+| Name | Type | Default | Docs |
+| ---  | ---  | ---     | ---  |
+| `name`* | `atom` |  | The name of the target attribute |
+| `generator`* | `(-> any) \| mfa \| (any -> any) \| mfa \| (any, any -> any) \| mfa` |  | A function which can generate an appropriate value for the attribute.œ |
+
+
+
+
+
+
+### Introspection
+
+Target: `Smokestack.Dsl.Attribute`
+
+
+
+
+### Introspection
+
+Target: `Smokestack.Dsl.Factory`
+
+
+
+

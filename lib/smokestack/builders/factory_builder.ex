@@ -42,13 +42,17 @@ defmodule Smokestack.FactoryBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(Factory.t()) ::
+  @spec option_schema(nil | Factory.t()) ::
           {:ok, OptionsHelpers.schema()} | {:error, error}
   def option_schema(factory) do
     attr_keys =
-      factory.resource
-      |> Resource.Info.attributes()
-      |> Enum.map(&{&1.name, [type: :any, required: false]})
+      if factory do
+        factory.resource
+        |> Resource.Info.attributes()
+        |> Enum.map(&{&1.name, [type: :any, required: false]})
+      else
+        [{:*, [type: :any, required: false]}]
+      end
 
     {:ok,
      [
@@ -56,7 +60,20 @@ defmodule Smokestack.FactoryBuilder do
          type: :map,
          required: false,
          default: %{},
-         keys: attr_keys
+         keys: attr_keys,
+         doc: """
+         Attribute overrides.
+
+         You can directly specify any overrides you would like set on the
+         resulting record without running their normal generator.
+
+         For example:
+
+         ```elixir
+         post = params!(Post, attrs: %{title: "What's wrong with Huntly?"})
+         assert post.title == "What's wrong with Huntly?"
+         ```
+         """
        ]
      ]}
   end

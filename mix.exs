@@ -23,18 +23,37 @@ defmodule Smokestack.MixProject do
       aliases: aliases(),
       dialyzer: [plt_add_apps: [:faker]],
       docs: [
-        main: "Smokestack"
+        main: "Smokestack",
+        extra_section: "GUIDES",
+        formatters: ["html"],
+        filter_modules: ~r/^Elixir.Smokestack/,
+        source_url_pattern:
+          "https://code.harton.nz/james/smokestack/src/branch/main/%{path}#L%{line}",
+        spark: [
+          extensions: [
+            %{
+              module: Smokestack.Dsl,
+              name: "Smokestack.Dsl",
+              target: "Smokestack",
+              type: "Smokestack"
+            }
+          ]
+        ]
       ]
     ]
   end
 
   def package do
     [
+      name: :smokestack,
+      files: ~w[lib .formatter.exs mix.exs README* LICENSE* CHANGELOG* documentation],
       maintainers: ["James Harton <james@harton.nz>"],
       licenses: ["HL3-FULL"],
       links: %{
-        "Source" => "https://code.harton.nz/james/smokestack"
-      }
+        "Source" => "https://code.harton.nz/james/smokestack",
+        "Github Mirror" => "https://github.com/jimsynz/smokestack"
+      },
+      source_url: "https://code.harton.nz/james/smokestack"
     ]
   end
 
@@ -60,13 +79,14 @@ defmodule Smokestack.MixProject do
       {:git_ops, "~> 2.6", opts},
       {:mix_audit, "~> 2.1", opts},
       {:recase, "~> 0.7"},
-      {:spark, "~> 1.1"}
+      {:spark, "~> 1.1 and >= 1.1.39"}
     ]
   end
 
   defp aliases do
     [
-      "spark.formatter": "spark.formatter --extensions=Smokestack.Dsl"
+      "spark.formatter": "spark.formatter --extensions=Smokestack.Dsl",
+      "spark.cheat_sheets": "spark.cheat_sheets --extensions=Smokestack.Dsl"
     ]
   end
 

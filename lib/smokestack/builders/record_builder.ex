@@ -31,20 +31,35 @@ defmodule Smokestack.RecordBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
   def option_schema(factory) do
-    with {:ok, schema0} <- RelatedBuilder.option_schema(factory),
-         {:ok, schema1} <- ManyBuilder.option_schema(factory) do
-      loadable_names =
-        factory.resource
-        |> Resource.Info.relationships()
-        |> Enum.concat(Resource.Info.aggregates(factory.resource))
-        |> Enum.concat(Resource.Info.calculations(factory.resource))
-        |> Enum.map(& &1.name)
-        |> Enum.uniq()
+    with {:ok, related_schema} <- RelatedBuilder.option_schema(factory),
+         {:ok, many_schema} <- ManyBuilder.option_schema(factory) do
+      load_type =
+        if factory do
+          loadable_names =
+            factory.resource
+            |> Resource.Info.relationships()
+            |> Enum.concat(Resource.Info.aggregates(factory.resource))
+            |> Enum.concat(Resource.Info.calculations(factory.resource))
+            |> Enum.map(& &1.name)
+            |> Enum.uniq()
 
-      schema1 =
-        Keyword.update!(schema1, :count, fn current ->
+          {:or,
+           [
+             {:wrap_list, {:in, loadable_names}},
+             {:keyword_list,
+              Enum.map(
+                loadable_names,
+                &{&1, type: {:or, [:atom, :keyword_list]}, required: false}
+              )}
+           ]}
+        else
+          {:or, [{:wrap_list, :atom}, :keyword_list]}
+        end
+
+      many_schema =
+        Keyword.update!(many_schema, :count, fn current ->
           current
           |> Keyword.update!(:type, &{:or, [&1, nil]})
           |> Keyword.put(:default, nil)
@@ -54,22 +69,26 @@ defmodule Smokestack.RecordBuilder do
       schema =
         [
           load: [
-            type:
-              {:or,
-               [
-                 {:wrap_list, {:in, loadable_names}},
-                 {:keyword_list,
-                  Enum.map(
-                    loadable_names,
-                    &{&1, type: {:or, [:atom, :keyword_list]}, required: false}
-                  )}
-               ]},
+            type: load_type,
             required: false,
-            default: []
+            default: [],
+            doc: """
+            An optional Ash load statement.
+
+            You can request any calculations, aggregates or relationships you
+            would like loaded on the returned record.
+
+            For example:
+
+            ```elixir
+            insert!(Post, load: [:full_title])
+            assert is_binary(post.full_title)
+            ```
+            """
           ]
         ]
-        |> Keyword.merge(schema0)
-        |> Keyword.merge(schema1)
+        |> OptionsHelpers.merge_schemas(many_schema, "Options for building multiple instances")
+        |> OptionsHelpers.merge_schemas(related_schema, "Options for building relationships")
 
       {:ok, schema}
     end

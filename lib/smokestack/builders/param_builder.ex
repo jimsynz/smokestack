@@ -69,59 +69,117 @@ defmodule Smokestack.ParamBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
   def option_schema(factory) do
-    with {:ok, schema0} <- RelatedBuilder.option_schema(factory),
-         {:ok, schema1} <- ManyBuilder.option_schema(factory) do
-      schema1 =
-        Keyword.update!(schema1, :count, fn current ->
+    with {:ok, related_schema} <- RelatedBuilder.option_schema(factory),
+         {:ok, many_schema} <- ManyBuilder.option_schema(factory) do
+      many_schema =
+        Keyword.update!(many_schema, :count, fn current ->
           current
           |> Keyword.update!(:type, &{:or, [&1, nil]})
           |> Keyword.put(:default, nil)
           |> Keyword.put(:required, false)
         end)
 
+      our_schema = [
+        encode: [
+          type: {:or, [nil, :module]},
+          required: false,
+          doc: """
+          Provide an encoder module.
+
+          If provided the result will be passed to an `encode/1` function
+          which should return an ok/error tuple with the encoded result.
+
+          This is primarily for use with `Jason` or `Poison`, however you may
+          wish to define your own encoder for your tests.
+
+          For example:
+
+          ```elixir
+          post = params!(Post, encoder: Jason)
+          assert Jason.decode!(post)
+          ```
+          """
+        ],
+        nest: [
+          type: {:or, [:atom, :string]},
+          required: false,
+          doc: """
+          Nest the result within an arbitrary map key.
+
+          Mostly provided as a shorthand for building API requests where the
+          built instance may need to be nested inside a key such as `data`.
+
+          Takes the result and nests it in a map under the provided key.
+
+          For example:
+
+          ```elixir
+          request = params!(Post, nest: :data)
+          assert is_binary(request.data.title)
+          ```
+
+          If you need a more complicated mangling of the result, I suggest
+          using the `encode` option.
+          """
+        ],
+        key_case: [
+          type:
+            {:or,
+             [
+               {:tuple, [{:literal, :path}, :string]},
+               {:in,
+                [
+                  :camel,
+                  :constant,
+                  :dot,
+                  :header,
+                  :kebab,
+                  :name,
+                  :pascal,
+                  :path,
+                  :sentence,
+                  :snake,
+                  :title
+                ]}
+             ]},
+          required: false,
+          default: :snake,
+          doc: """
+          Change the key case.
+
+          Sometimes you will need to change the case of the keys before sending
+          to an API.  Behind the scenes we use [recase](https://hexdocs.pm/recase)
+          to remap the keys as specified.
+
+          For example:
+
+              iex> params!(Post, key_case: :kebab) |> Map.keys()
+              [:title, :"sub-title"]
+          """
+        ],
+        key_type: [
+          type: {:in, [:string, :atom]},
+          required: false,
+          default: :atom,
+          doc: """
+          Specify string or atom keys.
+
+          Allows you to specify the type of the returned keys.
+
+          For example:
+
+              iex> params!(Post, key_type: :string) |> Map.keys()
+              ["title", "sub_title"]
+          """
+        ]
+      ]
+
       schema =
-        schema0
-        |> Keyword.merge(schema1)
-        |> Keyword.merge(
-          encode: [
-            type: {:or, [nil, :module]},
-            required: false
-          ],
-          nest: [
-            type: {:or, [:atom, :string]},
-            required: false
-          ],
-          key_case: [
-            type:
-              {:or,
-               [
-                 {:tuple, [{:literal, :path}, :string]},
-                 {:in,
-                  [
-                    :camel,
-                    :constant,
-                    :dot,
-                    :header,
-                    :kebab,
-                    :name,
-                    :pascal,
-                    :path,
-                    :sentence,
-                    :snake,
-                    :title
-                  ]}
-               ]},
-            required: false,
-            default: :snake
-          ],
-          key_type: [
-            type: {:in, [:string, :atom]},
-            required: false,
-            default: :atom
-          ]
-        )
+        our_schema
+        |> OptionsHelpers.merge_schemas(many_schema, "Options for building multiple instances")
+        |> OptionsHelpers.merge_schemas(related_schema, "Options for building relationships")
 
       {:ok, schema}
     end

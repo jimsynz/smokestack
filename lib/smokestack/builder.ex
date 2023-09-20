@@ -18,7 +18,7 @@ defmodule Smokestack.Builder do
   @doc """
   Provide a schema for validating options.
   """
-  @callback option_schema(Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, any}
+  @callback option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, any}
 
   @doc """
   Given a builder and a factory, validate it's options and call the builder.
@@ -29,5 +29,14 @@ defmodule Smokestack.Builder do
          {:ok, options} <- OptionsHelpers.validate(options, schema) do
       builder.build(factory, options)
     end
+  end
+
+  @doc """
+  Generate documentation for the available options.
+  """
+  @spec docs(t, nil | Factory.t()) :: String.t()
+  def docs(builder, factory) do
+    {:ok, schema} = builder.option_schema(factory)
+    OptionsHelpers.docs(schema)
   end
 end

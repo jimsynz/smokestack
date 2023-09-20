@@ -30,10 +30,32 @@ defmodule Smokestack.ManyBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
   def option_schema(factory) do
-    with {:ok, schema} <- RelatedBuilder.option_schema(factory) do
-      {:ok, Keyword.put(schema, :count, type: :pos_integer, required: true)}
+    with {:ok, related_schema} <- RelatedBuilder.option_schema(factory) do
+      schema =
+        [
+          count: [
+            type: :pos_integer,
+            required: true,
+            doc: """
+            Specify the number of instances to build.
+
+            Use this option to run the factory a number of times and return the
+            results as a list.
+
+            For example:
+
+            ```elixir
+            posts = params!(Post, count: 3)
+            assert length(posts) == 3
+            ```
+            """
+          ]
+        ]
+        |> OptionsHelpers.merge_schemas(related_schema, "Options for building relationships")
+
+      {:ok, schema}
     end
   end
 
