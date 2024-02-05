@@ -18,8 +18,8 @@ defmodule Smokestack.MixProject do
       deps: deps(),
       description: @moduledoc,
       package: package(),
-      source_url: "https://code.harton.nz/james/smokestack",
-      homepage_url: "https://code.harton.nz/james/smokestack",
+      source_url: "https://harton.dev/james/smokestack",
+      homepage_url: "https://harton.dev/james/smokestack",
       aliases: aliases(),
       dialyzer: [plt_add_apps: [:faker]],
       docs: [
@@ -28,7 +28,7 @@ defmodule Smokestack.MixProject do
         formatters: ["html"],
         filter_modules: ~r/^Elixir.Smokestack/,
         source_url_pattern:
-          "https://code.harton.nz/james/smokestack/src/branch/main/%{path}#L%{line}",
+          "https://harton.dev/james/smokestack/src/branch/main/%{path}#L%{line}",
         spark: [
           extensions: [
             %{
@@ -75,10 +75,10 @@ defmodule Smokestack.MixProject do
       maintainers: ["James Harton <james@harton.nz>"],
       licenses: ["HL3-FULL"],
       links: %{
-        "Source" => "https://code.harton.nz/james/smokestack",
+        "Source" => "https://harton.dev/james/smokestack",
         "Github Mirror" => "https://github.com/jimsynz/smokestack"
       },
-      source_url: "https://code.harton.nz/james/smokestack"
+      source_url: "https://harton.dev/james/smokestack"
     ]
   end
 
