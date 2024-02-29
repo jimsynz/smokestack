@@ -100,7 +100,7 @@ defmodule Smokestack.MixProject do
       {:earmark, ">= 0.0.0", opts},
       {:ex_check, "~> 0.15", opts},
       {:ex_doc, ">= 0.0.0", opts},
-      {:faker, "~> 0.17", opts},
+      {:faker, "~> 0.18", opts},
       {:git_ops, "~> 2.6", opts},
       {:mix_audit, "~> 2.1", opts},
       {:recase, "~> 0.7"},
