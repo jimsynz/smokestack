@@ -98,7 +98,7 @@ defmodule Smokestack.MixProject do
       {:dialyxir, "~> 1.3", opts},
       {:doctor, "~> 0.21", opts},
       {:earmark, ">= 0.0.0", opts},
-      {:ex_check, "~> 0.15", opts},
+      {:ex_check, "~> 0.16", opts},
       {:ex_doc, ">= 0.0.0", opts},
       {:faker, "~> 0.18", opts},
       {:git_ops, "~> 2.6", opts},
