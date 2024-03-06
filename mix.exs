@@ -23,7 +23,7 @@ defmodule Smokestack.MixProject do
       aliases: aliases(),
       dialyzer: [plt_add_apps: [:faker]],
       docs: [
-        main: "Smokestack",
+        main: "readme",
         extra_section: "GUIDES",
         formatters: ["html"],
         filter_modules: ~r/^Elixir.Smokestack/,
@@ -40,12 +40,10 @@ defmodule Smokestack.MixProject do
           ]
         ],
         extras:
-          ["README.md"]
-          |> Enum.concat(Path.wildcard("documentation/**/*.{md,livemd,cheatmd}"))
-          |> Enum.map(fn
-            "README.md" -> {:"README.md", title: "Read Me", ash_hq?: false}
-            "documentation/" <> _ = path -> {String.to_atom(path), []}
-          end),
+          Enum.concat(
+            ["README.md", "CHANGELOG.md"],
+            Path.wildcard("documentation/**/*.{md,livemd,cheatmd}")
+          ),
         groups_for_extras:
           "documentation/*"
           |> Path.wildcard()
@@ -76,7 +74,9 @@ defmodule Smokestack.MixProject do
       licenses: ["HL3-FULL"],
       links: %{
         "Source" => "https://harton.dev/james/smokestack",
-        "Github Mirror" => "https://github.com/jimsynz/smokestack"
+        "Github Mirror" => "https://github.com/jimsynz/smokestack",
+        "Changelog" => "https://docs.harton.nz/james/smokestack/changelog.html",
+        "Sponsor" => "https://github.com/sponsors/jimsynz"
       },
       source_url: "https://harton.dev/james/smokestack"
     ]
