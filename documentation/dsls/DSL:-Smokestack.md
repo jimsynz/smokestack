@@ -30,7 +30,7 @@ The DSL definition for the Smokestack DSL.
 
 ---
 
-* `:api` (`t:atom/0`) - The default Ash API to use when evaluating loads
+* `:domain` (module that adopts `Ash.Domain`) - The default Ash Domain to use when evaluating loads
 
 
 
@@ -42,9 +42,9 @@ Define factories for a resource
 
 
 
-* `:api` (`t:atom/0`) - The Ash API to use when evaluating loads
+* `:domain` (module that adopts `Ash.Domain`) - The Ash Domain to use when evaluating loads
 
-* `:resource` (`t:atom/0`) - Required. An Ash Resource
+* `:resource` (module that adopts `Ash.Resource`) - Required. An Ash Resource
 
 * `:variant` (`t:atom/0`) - The name of a factory variant The default value is `:default`.
 
@@ -89,7 +89,7 @@ Define factories for a resource
 
 | Name | Type | Default | Docs |
 |------|------|---------|------|
-| [`api`](#smokestack-api){: #smokestack-api } | `module` |  | The default Ash API to use when evaluating loads |
+| [`domain`](#smokestack-domain){: #smokestack-domain } | `module` |  | The default Ash Domain to use when evaluating loads |
 
 
 
@@ -117,7 +117,7 @@ Define factories for a resource
 
 | Name | Type | Default | Docs |
 |------|------|---------|------|
-| [`api`](#smokestack-factory-api){: #smokestack-factory-api } | `module` |  | The Ash API to use when evaluating loads |
+| [`domain`](#smokestack-factory-domain){: #smokestack-factory-domain } | `module` |  | The Ash Domain to use when evaluating loads |
 
 
 ## smokestack.factory.attribute
@@ -137,7 +137,7 @@ attribute name, generator
 | Name | Type | Default | Docs |
 |------|------|---------|------|
 | [`name`](#smokestack-factory-attribute-name){: #smokestack-factory-attribute-name .spark-required} | `atom` |  | The name of the target attribute |
-| [`generator`](#smokestack-factory-attribute-generator){: #smokestack-factory-attribute-generator .spark-required} | `(-> any) \| mfa \| (any -> any) \| mfa \| (any, any -> any) \| mfa` |  | A function which can generate an appropriate value for the attribute.œ |
+| [`generator`](#smokestack-factory-attribute-generator){: #smokestack-factory-attribute-generator .spark-required} | `(-> any) \| mfa \| (any -> any) \| mfa \| (any, any -> any) \| mfa \| Smokestack.Template.Choose \| Smokestack.Template.Constant \| Smokestack.Template.Cycle \| Smokestack.Template.NTimes \| Smokestack.Template.Sequence` |  | A function which can generate an appropriate value for the attribute.œ |
 
 
 

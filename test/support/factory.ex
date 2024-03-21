@@ -9,7 +9,7 @@ defmodule Support.Factory do
   end
 
   factory Support.Author, :trek do
-    attribute :name, choose(["JL", "Doc Holoday", "BLT", "Cal Hudson"])
+    attribute :name, choose(["JL", "Dr Mark", "BLT", "Cal Hudson"])
 
     attribute :email, fn
       %{name: "JL"} -> "captain@entrepreneur.starfleet"
@@ -20,7 +20,7 @@ defmodule Support.Factory do
   end
 
   factory Support.Post do
-    api Support.Api
+    domain Support.Domain
 
     attribute :title, &Faker.Commerce.product_name/0
     attribute :tags, n_times(3..20, &Faker.Lorem.word/0)

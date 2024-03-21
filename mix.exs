@@ -93,7 +93,7 @@ defmodule Smokestack.MixProject do
     opts = [only: ~w[dev test]a, runtime: false]
 
     [
-      {:ash, "~> 2.13"},
+      {:ash, "== 3.0.0-rc.0"},
       {:credo, "~> 1.7", opts},
       {:dialyxir, "~> 1.3", opts},
       {:doctor, "~> 0.21", opts},
@@ -104,7 +104,7 @@ defmodule Smokestack.MixProject do
       {:git_ops, "~> 2.6", opts},
       {:mix_audit, "~> 2.1", opts},
       {:recase, "~> 0.7"},
-      {:spark, "< 3.0.0"}
+      {:spark, "~> 2.1"}
     ]
   end
 

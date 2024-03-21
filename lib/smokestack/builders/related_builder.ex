@@ -6,7 +6,7 @@ defmodule Smokestack.RelatedBuilder do
 
   alias Ash.Resource
   alias Smokestack.{Builder, Dsl.Factory, Dsl.Info, FactoryBuilder}
-  alias Spark.OptionsHelpers
+  alias Spark.Options
   @behaviour Builder
 
   @type option :: build_option | FactoryBuilder.option()
@@ -32,7 +32,7 @@ defmodule Smokestack.RelatedBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
   def option_schema(factory) do
     with {:ok, factory_schema} <- FactoryBuilder.option_schema(factory) do
       build_type =
@@ -95,7 +95,7 @@ defmodule Smokestack.RelatedBuilder do
             """
           ]
         ]
-        |> OptionsHelpers.merge_schemas(factory_schema, "Options for building instances")
+        |> Options.merge(factory_schema, "Options for building instances")
 
       {:ok, schema}
     end

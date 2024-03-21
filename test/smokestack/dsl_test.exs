@@ -6,7 +6,8 @@ defmodule Smokestack.DslTest do
     @moduledoc false
     use Ash.Resource,
       data_layer: Ash.DataLayer.Ets,
-      validate_api_inclusion?: false
+      validate_domain_inclusion?: false,
+      domain: nil
 
     ets do
       private? true
