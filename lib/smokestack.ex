@@ -252,7 +252,7 @@ defmodule Smokestack do
 
         defmacro __using__(_) do
           quote do
-            import __MODULE__
+            import unquote(__MODULE__)
           end
         end
 

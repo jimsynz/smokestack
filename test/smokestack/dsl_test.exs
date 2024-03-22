@@ -83,4 +83,27 @@ defmodule Smokestack.DslTest do
       end
     end
   end
+
+  test "factories can be used" do
+    defmodule UsableFactory do
+      @moduledoc false
+      use Smokestack
+
+      factory Post do
+        attribute :title, &Faker.Company.catch_phrase/0
+      end
+    end
+
+    defmodule FactoryUser do
+      @moduledoc false
+      use UsableFactory
+
+      def test do
+        insert!(Post)
+      end
+    end
+
+    assert %Post{title: title} = FactoryUser.test()
+    assert title =~ ~r/[a-z]+/i
+  end
 end
