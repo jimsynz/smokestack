@@ -5,6 +5,13 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.5.0-rc.0](https://harton.dev/james/smokestack/compare/v0.4.2...v0.5.0-rc.0) (2024-03-27)
+### Breaking Changes:
+
+* Ash 3.0 support. (#42)
+
+
+
 ## [v0.4.2](https://harton.dev/james/smokestack/compare/v0.4.1...v0.4.2) (2024-03-22)
 
 
