@@ -1,6 +1,6 @@
 # Smokestack
 
-[![Build Status](https://drone.harton.nz/api/badges/james/smokestack/status.svg?ref=refs/heads/main)](https://drone.harton.nz/james/smokestack)
+[![Build Status](https://drone.harton.dev/api/badges/james/smokestack/status.svg?ref=refs/heads/main)](https://drone.harton.nz/james/smokestack)
 [![Hippocratic License HL3-FULL](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-FULL&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/full.html)
 
 Smokestack provides a way to define test factories for your [Ash Resources](https://ash-hq.org/docs/module/ash/latest/ash-resource) using a convenient DSL:
