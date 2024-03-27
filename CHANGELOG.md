@@ -5,6 +5,11 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.6.0](https://harton.dev/james/smokestack/compare/v0.5.0-rc.0...v0.6.0) (2024-03-27)
+
+
+
+
 ## [v0.5.0-rc.0](https://harton.dev/james/smokestack/compare/v0.4.2...v0.5.0-rc.0) (2024-03-27)
 ### Breaking Changes:
 
