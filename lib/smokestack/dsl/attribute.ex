@@ -33,7 +33,19 @@ defmodule Smokestack.Dsl.Attribute do
             doc: "The name of the target attribute"
           ],
           generator: [
-            type: {:or, [{:mfa_or_fun, 0}, {:mfa_or_fun, 1}, {:mfa_or_fun, 2}]},
+            type:
+              {:or,
+               [
+                 {:mfa_or_fun, 0},
+                 {:mfa_or_fun, 1},
+                 {:mfa_or_fun, 2},
+                 #  {:protocol, Smokestack.Template}
+                 {:struct, Smokestack.Template.Choose},
+                 {:struct, Smokestack.Template.Constant},
+                 {:struct, Smokestack.Template.Cycle},
+                 {:struct, Smokestack.Template.NTimes},
+                 {:struct, Smokestack.Template.Sequence}
+               ]},
             required: true,
             doc: """
             A function which can generate an appropriate value for the attribute.œ

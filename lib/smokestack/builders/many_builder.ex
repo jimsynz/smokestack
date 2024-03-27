@@ -4,7 +4,7 @@ defmodule Smokestack.ManyBuilder do
   """
 
   alias Smokestack.{Builder, Dsl.Factory, RelatedBuilder}
-  alias Spark.OptionsHelpers
+  alias Spark.Options
   @behaviour Builder
 
   @type option :: count_option | RelatedBuilder.option()
@@ -30,7 +30,7 @@ defmodule Smokestack.ManyBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
   def option_schema(factory) do
     with {:ok, related_schema} <- RelatedBuilder.option_schema(factory) do
       schema =
@@ -53,7 +53,7 @@ defmodule Smokestack.ManyBuilder do
             """
           ]
         ]
-        |> OptionsHelpers.merge_schemas(related_schema, "Options for building relationships")
+        |> Options.merge(related_schema, "Options for building relationships")
 
       {:ok, schema}
     end

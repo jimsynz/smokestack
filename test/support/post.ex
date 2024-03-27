@@ -3,7 +3,8 @@ defmodule Support.Post do
 
   use Ash.Resource,
     data_layer: Ash.DataLayer.Ets,
-    validate_api_inclusion?: false
+    validate_domain_inclusion?: false,
+    domain: nil
 
   ets do
     private? true
@@ -14,19 +15,23 @@ defmodule Support.Post do
 
     attribute :title, :string do
       allow_nil? false
+      public? true
     end
 
-    attribute :sub_title, :string
+    attribute :sub_title, :string, public?: true
 
     attribute :tags, {:array, :ci_string} do
       constraints items: [
                     match: ~r/^[a-zA-Z]+$/,
                     casing: :lower
                   ]
+
+      public? true
     end
 
     attribute :body, :string do
       allow_nil? false
+      public? true
     end
 
     timestamps()
@@ -38,6 +43,7 @@ defmodule Support.Post do
 
   actions do
     defaults [:create, :read, :update, :destroy]
+    default_accept :*
   end
 
   calculations do

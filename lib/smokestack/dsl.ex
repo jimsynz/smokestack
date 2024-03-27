@@ -7,10 +7,10 @@ defmodule Smokestack.Dsl do
     top_level?: true,
     entities: Factory.__entities__(),
     schema: [
-      api: [
-        type: {:behaviour, Ash.Api},
+      domain: [
+        type: {:behaviour, Ash.Domain},
         required: false,
-        doc: "The default Ash API to use when evaluating loads"
+        doc: "The default Ash Domain to use when evaluating loads"
       ]
     ]
   }

@@ -5,7 +5,7 @@ defmodule Smokestack.RecordBuilder do
 
   alias Ash.{Resource, Seed}
   alias Smokestack.{Builder, Dsl.Factory, ManyBuilder, RelatedBuilder}
-  alias Spark.OptionsHelpers
+  alias Spark.Options
   @behaviour Builder
 
   @type option :: load_option | ManyBuilder.option() | RelatedBuilder.option()
@@ -31,7 +31,7 @@ defmodule Smokestack.RecordBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
   def option_schema(factory) do
     with {:ok, related_schema} <- RelatedBuilder.option_schema(factory),
          {:ok, many_schema} <- ManyBuilder.option_schema(factory) do
@@ -87,8 +87,8 @@ defmodule Smokestack.RecordBuilder do
             """
           ]
         ]
-        |> OptionsHelpers.merge_schemas(many_schema, "Options for building multiple instances")
-        |> OptionsHelpers.merge_schemas(related_schema, "Options for building relationships")
+        |> Options.merge(many_schema, "Options for building multiple instances")
+        |> Options.merge(related_schema, "Options for building relationships")
 
       {:ok, schema}
     end
@@ -143,9 +143,9 @@ defmodule Smokestack.RecordBuilder do
 
   defp maybe_load(record_or_records, _factory, []), do: {:ok, record_or_records}
 
-  defp maybe_load(_record_or_records, factory, _load) when is_nil(factory.api),
-    do: {:error, "Unable to perform `load` operation without an API."}
+  defp maybe_load(_record_or_records, factory, _load) when is_nil(factory.domain),
+    do: {:error, "Unable to perform `load` operation without an Domain."}
 
   defp maybe_load(record_or_records, factory, load),
-    do: factory.api.load(record_or_records, load, [])
+    do: Ash.load(record_or_records, load, domain: factory.domain)
 end

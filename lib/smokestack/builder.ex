@@ -4,7 +4,7 @@ defmodule Smokestack.Builder do
   """
 
   alias Smokestack.Dsl.Factory
-  alias Spark.OptionsHelpers
+  alias Spark.Options
 
   @type result :: any
   @type error :: any
@@ -18,7 +18,7 @@ defmodule Smokestack.Builder do
   @doc """
   Provide a schema for validating options.
   """
-  @callback option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, any}
+  @callback option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, any}
 
   @doc """
   Given a builder and a factory, validate it's options and call the builder.
@@ -26,7 +26,7 @@ defmodule Smokestack.Builder do
   @spec build(t, Factory.t(), Keyword.t()) :: {:ok, result} | {:error, error}
   def build(builder, factory, options) do
     with {:ok, schema} <- builder.option_schema(factory),
-         {:ok, options} <- OptionsHelpers.validate(options, schema) do
+         {:ok, options} <- Options.validate(options, schema) do
       builder.build(factory, options)
     end
   end
@@ -37,6 +37,6 @@ defmodule Smokestack.Builder do
   @spec docs(t, nil | Factory.t()) :: String.t()
   def docs(builder, factory) do
     {:ok, schema} = builder.option_schema(factory)
-    OptionsHelpers.docs(schema)
+    Options.docs(schema)
   end
 end

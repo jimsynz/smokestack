@@ -4,7 +4,7 @@ defmodule Smokestack.ParamBuilder do
   """
 
   alias Smokestack.{Builder, Dsl.Factory, ManyBuilder, RelatedBuilder}
-  alias Spark.OptionsHelpers
+  alias Spark.Options
   @behaviour Builder
 
   @type option ::
@@ -69,7 +69,7 @@ defmodule Smokestack.ParamBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) :: {:ok, OptionsHelpers.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
   def option_schema(factory) do
     with {:ok, related_schema} <- RelatedBuilder.option_schema(factory),
          {:ok, many_schema} <- ManyBuilder.option_schema(factory) do
@@ -178,8 +178,8 @@ defmodule Smokestack.ParamBuilder do
 
       schema =
         our_schema
-        |> OptionsHelpers.merge_schemas(many_schema, "Options for building multiple instances")
-        |> OptionsHelpers.merge_schemas(related_schema, "Options for building relationships")
+        |> Options.merge(many_schema, "Options for building multiple instances")
+        |> Options.merge(related_schema, "Options for building relationships")
 
       {:ok, schema}
     end

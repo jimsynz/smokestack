@@ -5,7 +5,7 @@ defmodule Smokestack.FactoryBuilder do
 
   alias Ash.Resource
   alias Smokestack.{Builder, Dsl.Attribute, Dsl.Factory, Template}
-  alias Spark.OptionsHelpers
+  alias Spark.Options
   @behaviour Builder
 
   @type option :: attrs_option
@@ -42,8 +42,7 @@ defmodule Smokestack.FactoryBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) ::
-          {:ok, OptionsHelpers.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
   def option_schema(factory) do
     attr_keys =
       if factory do

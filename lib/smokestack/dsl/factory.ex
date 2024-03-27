@@ -6,8 +6,8 @@ defmodule Smokestack.Dsl.Factory do
   """
 
   defstruct __identifier__: nil,
-            api: nil,
             attributes: [],
+            domain: nil,
             module: nil,
             resource: nil,
             variant: :default
@@ -18,10 +18,10 @@ defmodule Smokestack.Dsl.Factory do
 
   @type t :: %__MODULE__{
           __identifier__: any,
-          api: nil,
           attributes: [Attribute.t()],
-          resource: Resource.t(),
+          domain: nil,
           module: module,
+          resource: Resource.t(),
           variant: atom
         }
 
@@ -37,10 +37,10 @@ defmodule Smokestack.Dsl.Factory do
         imports: [Template],
         identifier: {:auto, :unique_integer},
         schema: [
-          api: [
-            type: {:behaviour, Ash.Api},
+          domain: [
+            type: {:behaviour, Ash.Domain},
             required: false,
-            doc: "The Ash API to use when evaluating loads"
+            doc: "The Ash Domain to use when evaluating loads"
           ],
           resource: [
             type: {:behaviour, Ash.Resource},

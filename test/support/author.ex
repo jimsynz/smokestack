@@ -3,7 +3,8 @@ defmodule Support.Author do
 
   use Ash.Resource,
     data_layer: Ash.DataLayer.Ets,
-    validate_api_inclusion?: false
+    validate_domain_inclusion?: false,
+    domain: nil
 
   ets do
     private? true
@@ -12,8 +13,8 @@ defmodule Support.Author do
   attributes do
     uuid_primary_key :id
 
-    attribute :name, :string
-    attribute :email, :ci_string
+    attribute :name, :string, public?: true
+    attribute :email, :ci_string, public?: true
 
     timestamps()
   end
@@ -24,6 +25,7 @@ defmodule Support.Author do
 
   actions do
     defaults [:create, :read, :update, :destroy]
+    default_accept :*
   end
 
   aggregates do
