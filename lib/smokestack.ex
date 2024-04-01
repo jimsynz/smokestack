@@ -52,7 +52,7 @@ defmodule Smokestack do
   ## Building resource records
 
   You can use `insert/2` and `insert!/2` to build and insert records.  Records
-  are inserted using `Ash.Seed.seed/2`, which means that they bypass the usual
+  are inserted using `Ash.Seed.seed!/2`, which means that they bypass the usual
   Ash lifecycle (actions, validations, etc).
 
   ### Options
