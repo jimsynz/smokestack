@@ -38,7 +38,7 @@ add it directly to your `mix.exs`:
 ```elixir
 def deps do
   [
-    {:smokestack, "~> 0.6.1-rc.0"},
+    {:smokestack, "~> 0.6.1-rc.1"},
   ]
 end
 ```

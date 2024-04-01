@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.6.1-rc.1](https://harton.dev/james/smokestack/compare/v0.6.1-rc.0...v0.6.1-rc.1) (2024-04-01)
+
+
+
+
+### Bug Fixes:
+
+* docs reference to `Ash.Seed.seed!/2`.
+
 ## [v0.6.1-rc.0](https://harton.dev/james/smokestack/compare/v0.6.0...v0.6.1-rc.0) (2024-03-30)
 
 
