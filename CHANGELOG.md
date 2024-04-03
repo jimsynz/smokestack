@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.6.1-rc.2](https://harton.dev/james/smokestack/compare/v0.6.1-rc.1...v0.6.1-rc.2) (2024-04-03)
+
+
+
+
+### Improvements:
+
+* loosen Ash RC requirement.
+
 ## [v0.6.1-rc.1](https://harton.dev/james/smokestack/compare/v0.6.1-rc.0...v0.6.1-rc.1) (2024-04-01)
 
 
