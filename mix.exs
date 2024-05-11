@@ -1,7 +1,7 @@
 defmodule Smokestack.MixProject do
   use Mix.Project
 
-  @version "0.6.1-rc.2"
+  @version "0.6.2"
 
   @moduledoc """
   Test factories for Ash resources.
@@ -93,7 +93,7 @@ defmodule Smokestack.MixProject do
     opts = [only: ~w[dev test]a, runtime: false]
 
     [
-      {:ash, "~> 3.0.0-rc.8"},
+      {:ash, "~> 3.0"},
       {:credo, "~> 1.7", opts},
       {:dialyxir, "~> 1.3", opts},
       {:doctor, "~> 0.21", opts},
