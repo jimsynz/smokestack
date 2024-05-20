@@ -9,12 +9,17 @@ defmodule Smokestack.RelatedBuilder do
   alias Spark.Options
   @behaviour Builder
 
-  @type option :: build_option | FactoryBuilder.option()
+  @type option :: build_option | relate_option | FactoryBuilder.option()
 
   @typedoc """
   A nested keyword list of associations that should also be built.
   """
   @type build_option :: {:build, Smokestack.recursive_atom_list()}
+
+  @typedoc """
+  A nested keyword list of previously built records to explicitly associate to the new record.
+  """
+  @type relate_option :: {:relate, [{atom, Resource.record()}]}
 
   @type result :: %{optional(atom) => any}
   @type error :: FactoryBuilder.error() | Exception.t()
@@ -25,8 +30,10 @@ defmodule Smokestack.RelatedBuilder do
   @impl true
   @spec build(Factory.t(), [option]) :: {:ok, result} | {:error, error}
   def build(factory, options) do
-    with {:ok, attrs} <- Builder.build(FactoryBuilder, factory, Keyword.delete(options, :build)) do
-      maybe_build_related(factory, attrs, options)
+    with {:ok, attrs} <-
+           Builder.build(FactoryBuilder, factory, Keyword.drop(options, [:build, :relate])),
+         {:ok, attrs} <- maybe_build_related(factory, attrs, options) do
+      maybe_relate(factory, attrs, options)
     end
   end
 
@@ -53,6 +60,26 @@ defmodule Smokestack.RelatedBuilder do
            ]}
         else
           {:or, [{:wrap_list, :atom}, :keyword_list]}
+        end
+
+      relate_type =
+        if factory do
+          factory.resource
+          |> Resource.Info.relationships()
+          |> Enum.map(fn
+            relationship when relationship.cardinality == :one ->
+              {relationship.name, [type: {:struct, relationship.destination}, required: false]}
+
+            relationship when relationship.cardinality == :many ->
+              {relationship.name,
+               [type: {:wrap_list, {:struct, relationship.destination}}, required: false]}
+          end)
+          |> case do
+            [] -> :keyword_list
+            keys -> {:or, [{:keyword_list, keys}]}
+          end
+        else
+          :keyword_list
         end
 
       schema =
@@ -83,15 +110,29 @@ defmodule Smokestack.RelatedBuilder do
               build one instance.
 
             If these caveats are an issue, then you can build them yourself and
-            pass them in using the `attrs` option.
+            pass them in using the `relate` option.
 
             For example:
 
             ```elixir
             posts = insert!(Post, count: 3)
-            author = insert(Author, posts: posts)
+            author = insert(Author, relate: [posts: posts])
             ```
+            """
+          ],
+          relate: [
+            type: relate_type,
+            required: false,
+            default: [],
+            doc: """
+            A list of records to relate.
 
+            For example
+
+            ```elixir
+            author = insert!(Author)
+            post = insert!(Post, relate: [author: Author])
+            ```
             """
           ]
         ]
@@ -150,6 +191,53 @@ defmodule Smokestack.RelatedBuilder do
         :many ->
           {:ok, Map.put(attrs, relationship.name, [related_attrs])}
       end
+    end
+  end
+
+  defp maybe_relate(factory, attrs, options) do
+    options
+    |> Keyword.get(:relate, [])
+    |> List.wrap()
+    |> Enum.map(fn {relationship, record} ->
+      {relationship, record, Resource.Info.relationship(factory.resource, relationship)}
+    end)
+    |> Enum.reduce_while({:ok, attrs}, fn
+      {relationship_name, _record, nil}, {:ok, _attrs} ->
+        {:halt,
+         {:error,
+          "No relationship named `#{inspect(relationship_name)}` defined on resource `#{inspect(factory.resource)}`"}}
+
+      {_, record, relationship}, {:ok, attrs} ->
+        case relate(attrs, relationship, record) do
+          {:ok, attrs} -> {:cont, {:ok, attrs}}
+          {:error, reason} -> {:halt, {:error, reason}}
+        end
+    end)
+  end
+
+  defp relate(attrs, relationship, record)
+       when is_struct(record, relationship.destination) and relationship.cardinality == :one,
+       do: {:ok, Map.put(attrs, relationship.name, record)}
+
+  defp relate(_attrs, relationship, record) when relationship.cardinality == :one,
+    do:
+      {:error,
+       "Expected value to be a `#{inspect(relationship.destination)}` record, however it is #{inspect(record)}"}
+
+  defp relate(attrs, relationship, records) when relationship.cardinality == :many do
+    records
+    |> Enum.reduce_while({:ok, []}, fn
+      record, {:ok, records} when is_struct(record, relationship.destination) ->
+        {:cont, {:ok, [record | records]}}
+
+      record, _ ->
+        {:halt,
+         {:error,
+          "Expected value to be a `#{inspect(relationship.destination)}` record, however it is #{inspect(record)}"}}
+    end)
+    |> case do
+      {:ok, records} -> {:ok, Map.put(attrs, relationship.name, records)}
+      {:error, reason} -> {:error, reason}
     end
   end
 

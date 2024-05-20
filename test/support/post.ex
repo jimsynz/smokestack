@@ -38,7 +38,7 @@ defmodule Support.Post do
   end
 
   relationships do
-    belongs_to :author, Support.Author
+    belongs_to :author, Support.Author, attribute_writable?: true
   end
 
   actions do

@@ -4,7 +4,7 @@ defmodule Smokestack.FactoryBuilder do
   """
 
   alias Ash.Resource
-  alias Smokestack.{Builder, Dsl.Attribute, Dsl.Factory, Template}
+  alias Smokestack.{Builder, Dsl.Factory, Template}
   alias Spark.Options
   @behaviour Builder
 
@@ -24,20 +24,17 @@ defmodule Smokestack.FactoryBuilder do
   @impl true
   @spec build(Factory.t(), [option]) :: {:ok, result} | {:error, error}
   def build(factory, options) do
-    overrides = options[:attrs]
+    overrides = Keyword.get(options, :attrs, %{})
 
-    factory
-    |> Map.get(:attributes, [])
-    |> Enum.filter(&is_struct(&1, Attribute))
-    |> Enum.reduce({:ok, %{}}, fn
-      attr, {:ok, attrs} when is_map_key(overrides, attr.name) ->
-        {:ok, Map.put(attrs, attr.name, Map.get(overrides, attr.name))}
-
-      attr, {:ok, attrs} ->
+    with {:ok, overrides} <- validate_overrides(factory, overrides) do
+      factory.attributes
+      |> remove_overridden_attrs(overrides)
+      |> Enum.reduce({:ok, overrides}, fn attr, {:ok, attrs} ->
         generator = maybe_initialise_generator(attr)
-        value = Template.generate(generator, attrs, options)
+        value = Template.generate(generator, attr, options)
         {:ok, Map.put(attrs, attr.name, value)}
-    end)
+      end)
+    end
   end
 
   @doc false
@@ -84,4 +81,26 @@ defmodule Smokestack.FactoryBuilder do
       generator
     end
   end
+
+  defp validate_overrides(factory, overrides) do
+    valid_attr_names =
+      factory.resource
+      |> Resource.Info.attributes()
+      |> Enum.map(& &1.name)
+
+    Enum.reduce_while(overrides, {:ok, overrides}, fn {key, _}, {:ok, overrides} ->
+      if key in valid_attr_names do
+        {:cont, {:ok, overrides}}
+      else
+        {:halt,
+         {:error,
+          "No attribute named `#{inspect(key)}` available on resource `#{inspect(factory.resource)}`"}}
+      end
+    end)
+  end
+
+  defp remove_overridden_attrs(attrs, overrides) when map_size(overrides) == 0, do: attrs
+
+  defp remove_overridden_attrs(attrs, overrides),
+    do: Enum.reject(attrs, &is_map_key(overrides, &1.name))
 end

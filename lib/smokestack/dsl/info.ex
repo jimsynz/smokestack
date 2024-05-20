@@ -27,4 +27,12 @@ defmodule Smokestack.Dsl.Info do
         {:ok, factory}
     end
   end
+
+  @doc "Raising version of `factory/3`"
+  def factory!(factory, resource, variant) do
+    case factory(factory, resource, variant) do
+      {:ok, factory} -> factory
+      {:error, reason} -> raise reason
+    end
+  end
 end

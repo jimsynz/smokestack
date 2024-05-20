@@ -2,9 +2,9 @@ defmodule Smokestack do
   alias Spark.{Dsl, Dsl.Extension}
 
   @moduledoc """
-  Smokestack provides a way to define test factories for your
-  [Ash Resources](https://ash-hq.org/docs/module/ash/latest/ash-resource)
-  using a convenient DSL:
+  Smokestack provides a way to define test factories for your [Ash
+  Resources](https://ash-hq.org/docs/module/ash/latest/ash-resource) using a
+  convenient DSL:
 
   ```
   defmodule MyApp.Factory do
@@ -36,8 +36,8 @@ defmodule Smokestack do
 
   ## Variants
 
-  Sometimes you need to make slightly different factories to build a resource
-  in a specific state for your test scenario.
+  Sometimes you need to make slightly different factories to build a resource in
+  a specific state for your test scenario.
 
   Here's an example defining an alternate `:trek` variant for the character
   factory defined above:
@@ -58,8 +58,8 @@ defmodule Smokestack do
   ### Options
 
   - `load`: an atom, list of atoms or keyword list of the same listing
-    relationships, calculations and aggregates that should be loaded
-    after the record is created.
+    relationships, calculations and aggregates that should be loaded after the
+    record is created.
   - `count`: rather than inserting just a single record, you can specify a
     number of records to be inserted.  A list of records will be returned.
   - `build`: an atom, list of atoms or keyword list of the same describing
@@ -68,6 +68,8 @@ defmodule Smokestack do
     used, and if not the `:default` variant will be.
   - `attrs`: A map or keyword list of attributes you would like to set directly
     on the created record, rather than using the value provided by the factory.
+  - `relate`: A keyword list of relationships to records (or lists of records)
+    to which you wish to directly relate the created record.
 
   ## Building parameters
 
@@ -76,20 +78,20 @@ defmodule Smokestack do
 
   ### Options
 
-  - `encode`: rather than returning a map or maps, provide an encoder module
-    to serialise the parameters.  Commonly you would use `Jason` or `Poison`.
-  - `nest`: rather than returning a map or maps directly, wrap the result in
-    an outer map using the provided key.
-  - `key_case`: change the case of the keys into one of the many cases
-    supported by [recase](https://hex.pm/packages/recase).
+  - `encode`: rather than returning a map or maps, provide an encoder module to
+    serialise the parameters.  Commonly you would use `Jason` or `Poison`.
+  - `nest`: rather than returning a map or maps directly, wrap the result in an
+    outer map using the provided key.
+  - `key_case`: change the case of the keys into one of the many cases supported
+    by [recase](https://hex.pm/packages/recase).
   - `key_type`: specify whether the returned map or maps should use string or
     atom keys (ignored when using the `encode` option).
-  - `count`: rather than returning just a single map, you can specify a
-    number of results to be returned.  A list of maps will be returned.
+  - `count`: rather than returning just a single map, you can specify a number
+    of results to be returned.  A list of maps will be returned.
   - `build`: an atom, list of atoms or keyword list of the same describing
-    relationships which you would like built within the result.  If the
-    related resource has a variant which matches the current one, it will be
-    used, and if not the `:default` variant will be.
+    relationships which you would like built within the result.  If the related
+    resource has a variant which matches the current one, it will be used, and
+    if not the `:default` variant will be.
   - `attrs`: A map or keyword list of attributes you would like to set directly
     on the result, rather than using the value provided by the factory.
 
