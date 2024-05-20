@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.7.0](https://harton.dev/james/smokestack/compare/v0.6.2...v0.7.0) (2024-05-20)
+
+
+
+
+### Features:
+
+* related: Newly build records can now be related to existing records.
+
 ## [v0.6.2](https://harton.dev/james/smokestack/compare/v0.6.1-rc.2...v0.6.2) (2024-05-11)
 
 

@@ -1,7 +1,7 @@
 defmodule Smokestack.MixProject do
   use Mix.Project
 
-  @version "0.6.2"
+  @version "0.7.0"
 
   @moduledoc """
   Test factories for Ash resources.
