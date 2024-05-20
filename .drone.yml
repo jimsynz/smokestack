@@ -252,47 +252,47 @@ steps:
   - git log -1 --format=%s > .last_commit_message
   - asdf mix git_ops.check_message .last_commit_message
 
-# - name: mix git_ops.release
-#   image: harton.dev/james/asdf_container:latest
-#   when:
-#     branch:
-#     - main
-#     event:
-#       exclude:
-#       - pull_request
-#   depends_on:
-#   - mix test
-#   - mix credo
-#   - mix hex.audit
-#   - mix format
-#   - mix spark.formatter
-#   - mix spark.cheat_sheets
-#   - mix deps.unlock
-#   - mix doctor
-#   - mix git_ops.check_message
-#   environment:
-#     MIX_ENV: test
-#     HEX_HOME: /drone/src/.hex
-#     MIX_HOME: /drone/src/.mix
-#     REBAR_BASE_DIR: /drone/src/.rebar3
-#     ASDF_DATA_DIR: /drone/src/.asdf
-#     ASDF_DIR: /root/.asdf
-#     DRONE_TOKEN:
-#       from_secret: DRONE_TOKEN
-#   commands:
-#     - git fetch --tags
-#     - . $ASDF_DIR/asdf.sh
-#     - mix git_ops.project_info --format=shell > before.env
-#     - mix git_ops.release --yes --no-major || true
-#     - mix git_ops.project_info --format=shell > after.env
-#     - . ./before.env
-#     - export OLD_APP_VERSION=$${APP_VERSION}
-#     - . ./after.env
-#     - export NEW_APP_VERSION=$${APP_VERSION}
-#     - if [ "v$${OLD_APP_VERSION}" != "v$${NEW_APP_VERSION}" ]; then
-#     -   export GIT_URL=$(echo $DRONE_GIT_HTTP_URL | sed -e "s/:\\/\\//:\\/\\/$DRONE_REPO_OWNER:$DRONE_TOKEN@/")
-#     -   git push $${GIT_URL} "HEAD:${DRONE_COMMIT_REF}" "refs/tags/v$${NEW_APP_VERSION}"
-#     - fi
+- name: mix git_ops.release
+  image: harton.dev/james/asdf_container:latest
+  when:
+    branch:
+    - main
+    event:
+      exclude:
+      - pull_request
+  depends_on:
+  - mix test
+  - mix credo
+  - mix hex.audit
+  - mix format
+  - mix spark.formatter
+  - mix spark.cheat_sheets
+  - mix deps.unlock
+  - mix doctor
+  - mix git_ops.check_message
+  environment:
+    MIX_ENV: test
+    HEX_HOME: /drone/src/.hex
+    MIX_HOME: /drone/src/.mix
+    REBAR_BASE_DIR: /drone/src/.rebar3
+    ASDF_DATA_DIR: /drone/src/.asdf
+    ASDF_DIR: /root/.asdf
+    DRONE_TOKEN:
+      from_secret: DRONE_TOKEN
+  commands:
+    - git fetch --tags
+    - . $ASDF_DIR/asdf.sh
+    - mix git_ops.project_info --format=shell > before.env
+    - mix git_ops.release --yes --no-major || true
+    - mix git_ops.project_info --format=shell > after.env
+    - . ./before.env
+    - export OLD_APP_VERSION=$${APP_VERSION}
+    - . ./after.env
+    - export NEW_APP_VERSION=$${APP_VERSION}
+    - if [ "v$${OLD_APP_VERSION}" != "v$${NEW_APP_VERSION}" ]; then
+    -   export GIT_URL=$(echo $DRONE_GIT_HTTP_URL | sed -e "s/:\\/\\//:\\/\\/$DRONE_REPO_OWNER:$DRONE_TOKEN@/")
+    -   git push $${GIT_URL} "HEAD:${DRONE_COMMIT_REF}" "refs/tags/v$${NEW_APP_VERSION}"
+    - fi
 
 - name: build artifacts
   image: harton.dev/james/asdf_container:latest
