@@ -107,4 +107,42 @@ defmodule Smokestack.DslTest do
     assert %Post{title: title} = FactoryUser.test()
     assert title =~ ~r/[a-z]+/i
   end
+
+  test "before build hooks can be applied" do
+    defmodule BeforeBuildFactory do
+      @moduledoc false
+      use Smokestack
+
+      factory Post do
+        attribute :title, &Faker.Company.catch_phrase/0
+        before_build &capitalise_title/1
+      end
+
+      def capitalise_title(record) do
+        %{record | title: String.upcase(record.title)}
+      end
+    end
+
+    title = Faker.Company.catch_phrase()
+    upper_title = String.upcase(title)
+    assert %Post{title: ^upper_title} = BeforeBuildFactory.insert!(Post, attrs: %{title: title})
+  end
+
+  test "after build hooks can be applied" do
+    defmodule AfterBuildFactory do
+      @moduledoc false
+      use Smokestack
+
+      factory Post do
+        attribute :title, &Faker.Company.catch_phrase/0
+        after_build &add_metadata/1
+      end
+
+      def add_metadata(record) do
+        Ash.Resource.put_metadata(record, :wat, true)
+      end
+    end
+
+    assert %Post{__metadata__: %{wat: true}} = AfterBuildFactory.insert!(Post)
+  end
 end

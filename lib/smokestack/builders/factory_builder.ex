@@ -27,13 +27,22 @@ defmodule Smokestack.FactoryBuilder do
     overrides = Keyword.get(options, :attrs, %{})
 
     with {:ok, overrides} <- validate_overrides(factory, overrides) do
-      factory.attributes
-      |> remove_overridden_attrs(overrides)
-      |> Enum.reduce({:ok, overrides}, fn attr, {:ok, attrs} ->
-        generator = maybe_initialise_generator(attr)
-        value = Template.generate(generator, attr, options)
-        {:ok, Map.put(attrs, attr.name, value)}
-      end)
+      attrs =
+        factory.attributes
+        |> remove_overridden_attrs(overrides)
+        |> Enum.reduce(overrides, fn attr, attrs ->
+          generator = maybe_initialise_generator(attr)
+          value = Template.generate(generator, attr, options)
+          Map.put(attrs, attr.name, value)
+        end)
+
+      attrs =
+        factory.before_build
+        |> Enum.reduce(attrs, fn hook, attrs ->
+          hook.hook.(attrs)
+        end)
+
+      {:ok, attrs}
     end
   end
 

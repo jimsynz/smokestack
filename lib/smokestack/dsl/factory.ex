@@ -6,19 +6,23 @@ defmodule Smokestack.Dsl.Factory do
   """
 
   defstruct __identifier__: nil,
+            after_build: [],
             attributes: [],
+            before_build: [],
             domain: nil,
             module: nil,
             resource: nil,
             variant: :default
 
   alias Ash.Resource
-  alias Smokestack.Dsl.{Attribute, Template}
+  alias Smokestack.Dsl.{AfterBuild, Attribute, BeforeBuild, Template}
   alias Spark.Dsl.Entity
 
   @type t :: %__MODULE__{
           __identifier__: any,
+          after_build: [AfterBuild.t()],
           attributes: [Attribute.t()],
+          before_build: [BeforeBuild.t()],
           domain: nil,
           module: module,
           resource: Resource.t(),
@@ -54,7 +58,11 @@ defmodule Smokestack.Dsl.Factory do
             default: :default
           ]
         ],
-        entities: [attributes: Attribute.__entities__()]
+        entities: [
+          after_build: AfterBuild.__entities__(),
+          attributes: Attribute.__entities__(),
+          before_build: BeforeBuild.__entities__()
+        ]
       }
     ]
 end

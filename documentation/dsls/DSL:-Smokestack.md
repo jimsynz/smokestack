@@ -13,7 +13,9 @@ The DSL definition for the Smokestack DSL.
 
   * smokestack
     * factory
+      * after_build
       * attribute
+      * before_build
 
 ### Docs
 
@@ -22,7 +24,9 @@ The DSL definition for the Smokestack DSL.
 
 
  * [factory](#module-factory)
+   * after_build
    * attribute
+   * before_build
 
 
 
@@ -38,7 +42,9 @@ The DSL definition for the Smokestack DSL.
 
 Define factories for a resource
 
+    * after_build
     * attribute
+    * before_build
 
 
 
@@ -47,6 +53,26 @@ Define factories for a resource
 * `:resource` (module that adopts `Ash.Resource`) - Required. An Ash Resource
 
 * `:variant` (`t:atom/0`) - The name of a factory variant The default value is `:default`.
+
+
+
+##### after_build
+
+Modify the record after building.
+
+Allows you to provide a function which can modify the built record before returning.
+
+These hooks are only applied when building records and not parameters.
+
+
+
+
+
+
+* `:hook` (mfa or function of arity 1) - Required. A function which returns an updated record
+
+
+
 
 
 
@@ -67,6 +93,24 @@ Define factories for a resource
 
 
 
+##### before_build
+
+Modify the attributes before building.
+
+Allows you to provide a function which can modify the the attributes before building.
+
+
+
+
+
+
+* `:hook` (mfa or function of arity 1) - Required. A function which returns an updated record
+
+
+
+
+
+
 
 
 
@@ -79,7 +123,9 @@ Define factories for a resource
 
 ### Nested DSLs
  * [factory](#smokestack-factory)
+   * after_build
    * attribute
+   * before_build
 
 
 
@@ -102,7 +148,9 @@ factory resource, variant \\ :default
 Define factories for a resource
 
 ### Nested DSLs
+ * [after_build](#smokestack-factory-after_build)
  * [attribute](#smokestack-factory-attribute)
+ * [before_build](#smokestack-factory-before_build)
 
 
 
@@ -119,6 +167,38 @@ Define factories for a resource
 |------|------|---------|------|
 | [`domain`](#smokestack-factory-domain){: #smokestack-factory-domain } | `module` |  | The Ash Domain to use when evaluating loads |
 
+
+## smokestack.factory.after_build
+```elixir
+after_build hook
+```
+
+
+Modify the record after building.
+
+Allows you to provide a function which can modify the built record before returning.
+
+These hooks are only applied when building records and not parameters.
+
+
+
+
+
+
+### Arguments
+
+| Name | Type | Default | Docs |
+|------|------|---------|------|
+| [`hook`](#smokestack-factory-after_build-hook){: #smokestack-factory-after_build-hook .spark-required} | `(any -> any) \| mfa` |  | A function which returns an updated record |
+
+
+
+
+
+
+### Introspection
+
+Target: `Smokestack.Dsl.AfterBuild`
 
 ## smokestack.factory.attribute
 ```elixir
@@ -147,6 +227,36 @@ attribute name, generator
 ### Introspection
 
 Target: `Smokestack.Dsl.Attribute`
+
+## smokestack.factory.before_build
+```elixir
+before_build hook
+```
+
+
+Modify the attributes before building.
+
+Allows you to provide a function which can modify the the attributes before building.
+
+
+
+
+
+
+### Arguments
+
+| Name | Type | Default | Docs |
+|------|------|---------|------|
+| [`hook`](#smokestack-factory-before_build-hook){: #smokestack-factory-before_build-hook .spark-required} | `(any -> any) \| mfa` |  | A function which returns an updated record |
+
+
+
+
+
+
+### Introspection
+
+Target: `Smokestack.Dsl.BeforeBuild`
 
 
 

@@ -100,7 +100,9 @@ defmodule Smokestack.RecordBuilder do
 
     with {:ok, attr_list} <- Builder.build(ManyBuilder, factory, options),
          {:ok, record_list} <- seed(attr_list, factory) do
-      maybe_load(record_list, factory, load)
+      record_list
+      |> maybe_hook(factory)
+      |> maybe_load(factory, load)
     end
   end
 
@@ -109,7 +111,9 @@ defmodule Smokestack.RecordBuilder do
 
     with {:ok, attrs} <- Builder.build(RelatedBuilder, factory, options),
          {:ok, record} <- seed(attrs, factory) do
-      maybe_load(record, factory, load)
+      record
+      |> maybe_hook(factory)
+      |> maybe_load(factory, load)
     end
   end
 
@@ -148,4 +152,18 @@ defmodule Smokestack.RecordBuilder do
 
   defp maybe_load(record_or_records, factory, load),
     do: Ash.load(record_or_records, load, domain: factory.domain)
+
+  defp maybe_hook(records, factory) when is_list(records) do
+    Enum.map(records, fn record ->
+      Enum.reduce(factory.after_build, record, fn hook, record ->
+        hook.(record)
+      end)
+    end)
+  end
+
+  defp maybe_hook(record, factory) when is_map(record) do
+    Enum.reduce(factory.after_build, record, fn hook, record ->
+      hook.hook.(record)
+    end)
+  end
 end

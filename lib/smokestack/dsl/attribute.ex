@@ -2,7 +2,7 @@ defmodule Smokestack.Dsl.Attribute do
   @moduledoc """
   The `attribute ` DSL entity.
 
-  See `d:Smokestack.factory.default.attribute` for more information.
+  See `d:Smokestack.factory.attribute` for more information.
   """
 
   defstruct __identifier__: nil, generator: nil, name: nil
@@ -11,7 +11,7 @@ defmodule Smokestack.Dsl.Attribute do
   alias Spark.Dsl.Entity
 
   @type t :: %__MODULE__{
-          __identifier__: nil,
+          __identifier__: any,
           generator:
             mfa | (-> any) | (Resource.record() -> any) | (Resource.record(), keyword -> any),
           name: atom
