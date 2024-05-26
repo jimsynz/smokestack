@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.8.0](https://harton.dev/james/smokestack/compare/v0.7.0...v0.8.0) (2024-05-26)
+
+
+
+
+### Features:
+
+* Add `before_build` and `after_build` entities to factories.
+
 ## [v0.7.0](https://harton.dev/james/smokestack/compare/v0.6.2...v0.7.0) (2024-05-20)
 
 
