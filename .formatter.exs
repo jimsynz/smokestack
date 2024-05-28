@@ -3,6 +3,8 @@ spark_locals_without_parens = [
   after_build: 2,
   attribute: 2,
   attribute: 3,
+  auto_build: 1,
+  auto_load: 1,
   before_build: 1,
   before_build: 2,
   domain: 1,

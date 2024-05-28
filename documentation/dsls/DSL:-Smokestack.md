@@ -54,6 +54,10 @@ Define factories for a resource
 
 * `:variant` (`t:atom/0`) - The name of a factory variant The default value is `:default`.
 
+* `:auto_build` (one or a list of `t:atom/0`) - A list of relationships that should always be built when building this factory The default value is `[]`.
+
+* `:auto_load` - An Ash "load statement" to always apply when building this factory The default value is `[]`.
+
 
 
 ##### after_build
@@ -166,6 +170,8 @@ Define factories for a resource
 | Name | Type | Default | Docs |
 |------|------|---------|------|
 | [`domain`](#smokestack-factory-domain){: #smokestack-factory-domain } | `module` |  | The Ash Domain to use when evaluating loads |
+| [`auto_build`](#smokestack-factory-auto_build){: #smokestack-factory-auto_build } | `atom \| list(atom)` | `[]` | A list of relationships that should always be built when building this factory |
+| [`auto_load`](#smokestack-factory-auto_load){: #smokestack-factory-auto_load } | `atom \| keyword \| list(atom \| keyword)` | `[]` | An Ash "load statement" to always apply when building this factory |
 
 
 ## smokestack.factory.after_build

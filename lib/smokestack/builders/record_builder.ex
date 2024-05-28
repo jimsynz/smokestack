@@ -102,7 +102,7 @@ defmodule Smokestack.RecordBuilder do
          {:ok, record_list} <- seed(attr_list, factory) do
       record_list
       |> maybe_hook(factory)
-      |> maybe_load(factory, load)
+      |> maybe_load(factory, List.wrap(load))
     end
   end
 
@@ -113,7 +113,7 @@ defmodule Smokestack.RecordBuilder do
          {:ok, record} <- seed(attrs, factory) do
       record
       |> maybe_hook(factory)
-      |> maybe_load(factory, load)
+      |> maybe_load(factory, List.wrap(load))
     end
   end
 
@@ -145,13 +145,18 @@ defmodule Smokestack.RecordBuilder do
     |> Resource.put_metadata(:variant, factory.variant)
   end
 
-  defp maybe_load(record_or_records, _factory, []), do: {:ok, record_or_records}
+  defp maybe_load(record_or_records, %{auto_load: []}, []), do: {:ok, record_or_records}
 
   defp maybe_load(_record_or_records, factory, _load) when is_nil(factory.domain),
     do: {:error, "Unable to perform `load` operation without an Domain."}
 
-  defp maybe_load(record_or_records, factory, load),
-    do: Ash.load(record_or_records, load, domain: factory.domain)
+  defp maybe_load(record_or_records, factory, load) do
+    load =
+      factory.auto_load
+      |> Enum.concat(load)
+
+    Ash.load(record_or_records, load, domain: factory.domain)
+  end
 
   defp maybe_hook(records, factory) when is_list(records) do
     Enum.map(records, fn record ->

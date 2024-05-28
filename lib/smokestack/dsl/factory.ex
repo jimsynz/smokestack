@@ -8,6 +8,8 @@ defmodule Smokestack.Dsl.Factory do
   defstruct __identifier__: nil,
             after_build: [],
             attributes: [],
+            auto_load: [],
+            auto_build: [],
             before_build: [],
             domain: nil,
             module: nil,
@@ -22,6 +24,8 @@ defmodule Smokestack.Dsl.Factory do
           __identifier__: any,
           after_build: [AfterBuild.t()],
           attributes: [Attribute.t()],
+          auto_load: [atom] | Keyword.t(),
+          auto_build: [atom],
           before_build: [BeforeBuild.t()],
           domain: nil,
           module: module,
@@ -56,6 +60,18 @@ defmodule Smokestack.Dsl.Factory do
             required: false,
             doc: "The name of a factory variant",
             default: :default
+          ],
+          auto_build: [
+            type: {:wrap_list, :atom},
+            required: false,
+            doc: "A list of relationships that should always be built when building this factory",
+            default: []
+          ],
+          auto_load: [
+            type: {:wrap_list, {:or, [:atom, :keyword_list]}},
+            required: false,
+            doc: "An Ash \"load statement\" to always apply when building this factory",
+            default: []
           ]
         ],
         entities: [

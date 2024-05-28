@@ -145,6 +145,8 @@ defmodule Smokestack.RelatedBuilder do
     options
     |> Keyword.get(:build, [])
     |> List.wrap()
+    |> Enum.concat(factory.auto_build)
+    |> List.wrap()
     |> Enum.map(fn
       {key, value} -> {key, value}
       key when is_atom(key) -> {key, []}

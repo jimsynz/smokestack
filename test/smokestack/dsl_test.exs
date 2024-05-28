@@ -1,6 +1,7 @@
 defmodule Smokestack.DslTest do
   use ExUnit.Case, async: true
   alias Spark.Error.DslError
+  alias Support.Author
 
   defmodule Post do
     @moduledoc false
@@ -17,6 +18,18 @@ defmodule Smokestack.DslTest do
       uuid_primary_key :id
 
       attribute :title, :string
+    end
+
+    relationships do
+      belongs_to :author, Author
+    end
+
+    calculations do
+      calculate :title_first_word, :string, expr(title |> string_split() |> at(0))
+    end
+
+    actions do
+      defaults [:read]
     end
   end
 
@@ -144,5 +157,40 @@ defmodule Smokestack.DslTest do
     end
 
     assert %Post{__metadata__: %{wat: true}} = AfterBuildFactory.insert!(Post)
+  end
+
+  test "auto builds can be specified in the factory" do
+    defmodule AutoBuildFactory do
+      @moduledoc false
+      use Smokestack
+
+      factory Post do
+        attribute :title, &Faker.Company.catch_phrase/0
+        auto_build :author
+      end
+
+      factory Author do
+        attribute :name, &Faker.Internet.email/0
+        attribute :email, &Faker.Person.name/0
+      end
+    end
+
+    assert %Post{author: %Author{}} = AutoBuildFactory.insert!(Post)
+  end
+
+  test "auto loads can be specified in the factory" do
+    defmodule AutoLoadFactory do
+      @moduledoc false
+      use Smokestack
+
+      factory Post do
+        attribute :title, &Faker.Company.catch_phrase/0
+        auto_load :title_first_word
+        domain Support.Domain
+      end
+    end
+
+    assert post = AutoLoadFactory.insert!(Post)
+    assert post.title_first_word == post.title |> String.split(" ") |> List.first()
   end
 end

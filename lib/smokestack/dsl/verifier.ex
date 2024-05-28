@@ -9,7 +9,11 @@ defmodule Smokestack.Dsl.Verifier do
   @impl true
   @spec verify(Dsl.t()) :: :ok | {:error, DslError.t()}
   def verify(dsl_state) do
-    error_info = %{module: Verifier.get_persisted(dsl_state, :module), path: [:smokestack]}
+    error_info = %{
+      module: Verifier.get_persisted(dsl_state, :module),
+      path: [:smokestack],
+      dsl_state: dsl_state
+    }
 
     factories =
       dsl_state
@@ -68,7 +72,9 @@ defmodule Smokestack.Dsl.Verifier do
     error_info =
       Map.merge(error_info, %{resource: factory.resource, path: [:factory | error_info.path]})
 
-    with :ok <- verify_unique_attributes(factory, error_info) do
+    with :ok <- verify_unique_attributes(factory, error_info),
+         :ok <- verify_auto_build(factory, error_info),
+         :ok <- verify_auto_load(factory, error_info) do
       factory
       |> Map.get(:attributes, [])
       |> Enum.filter(&is_struct(&1, Attribute))
@@ -185,5 +191,77 @@ defmodule Smokestack.Dsl.Verifier do
            message: "No exported function matching `#{inspect(m)}.#{f}/#{min_arity}..#{max_arity}"
          )}
     end
+  end
+
+  defp verify_auto_build(factory, error_info) do
+    error_info = %{error_info | path: [:auto_build | error_info.path]}
+
+    Enum.reduce_while(factory.auto_build, :ok, fn relationship, :ok ->
+      error_info = %{error_info | path: [relationship | error_info.path]}
+
+      with {:ok, relationship} <- verify_relationship(factory.resource, relationship, error_info),
+           :ok <- verify_factory_exists(relationship.destination, error_info) do
+        {:cont, :ok}
+      else
+        {:error, error} -> {:halt, {:error, error}}
+      end
+    end)
+  end
+
+  defp verify_relationship(resource, relationship, error_info) do
+    case Info.relationship(resource, relationship) do
+      nil ->
+        {:error,
+         DslError.exception(
+           module: error_info.module,
+           path: Enum.reverse(error_info.path),
+           message:
+             "The resource `#{inspect(resource)}` has no relationship named `#{inspect(relationship)}`."
+         )}
+
+      relationship ->
+        {:ok, relationship}
+    end
+  end
+
+  defp verify_factory_exists(resource, error_info) do
+    factory_exists? =
+      error_info.dsl_state
+      |> Verifier.get_entities([:smokestack])
+      |> Enum.any?(&(is_struct(&1, Factory) && &1.resource == resource))
+
+    if factory_exists? do
+      :ok
+    else
+      {:error,
+       DslError.exception(
+         module: error_info.module,
+         path: Enum.reverse(error_info.path),
+         message: "No factories defined for resource `#{inspect(resource)}`."
+       )}
+    end
+  end
+
+  defp verify_auto_load(factory, error_info) do
+    error_info = %{error_info | path: [:auto_load | error_info.path]}
+
+    Enum.reduce_while(factory.auto_load, :ok, fn load, :ok ->
+      error_info = %{error_info | path: [load | error_info.path]}
+
+      with nil <- Info.calculation(factory.resource, load),
+           nil <- Info.aggregate(factory.resource, load),
+           nil <- Info.relationship(factory.resource, load) do
+        {:halt,
+         {:error,
+          DslError.exception(
+            module: error_info.module,
+            path: Enum.reverse(error_info.path),
+            message:
+              "Expected an aggregate, calculation or relationship named `#{inspect(load)}` on resource `#{inspect(factory.resource)}`"
+          )}}
+      else
+        _ -> {:cont, :ok}
+      end
+    end)
   end
 end
