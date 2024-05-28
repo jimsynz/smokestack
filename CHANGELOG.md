@@ -5,6 +5,17 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.8.1](https://harton.dev/james/smokestack/compare/v0.8.0...v0.8.1) (2024-05-28)
+
+
+
+
+### Bug Fixes:
+
+* Include `:variant` in option schema.
+
+* bug with generator arguments.
+
 ## [v0.8.0](https://harton.dev/james/smokestack/compare/v0.7.0...v0.8.0) (2024-05-26)
 
 
