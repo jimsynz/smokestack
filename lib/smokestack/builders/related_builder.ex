@@ -30,8 +30,7 @@ defmodule Smokestack.RelatedBuilder do
   @impl true
   @spec build(Factory.t(), [option]) :: {:ok, result} | {:error, error}
   def build(factory, options) do
-    with {:ok, attrs} <-
-           Builder.build(FactoryBuilder, factory, Keyword.drop(options, [:build, :relate])),
+    with {:ok, attrs} <- FactoryBuilder.build(factory, Keyword.drop(options, [:build, :relate])),
          {:ok, attrs} <- maybe_build_related(factory, attrs, options) do
       maybe_relate(factory, attrs, options)
     end
@@ -39,9 +38,9 @@ defmodule Smokestack.RelatedBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema(), String.t()} | {:error, error}
   def option_schema(factory) do
-    with {:ok, factory_schema} <- FactoryBuilder.option_schema(factory) do
+    with {:ok, factory_schema, factory_section} <- FactoryBuilder.option_schema(factory) do
       build_type =
         if factory do
           relationship_names =
@@ -136,9 +135,9 @@ defmodule Smokestack.RelatedBuilder do
             """
           ]
         ]
-        |> Options.merge(factory_schema, "Options for building instances")
+        |> Options.merge(factory_schema, factory_section)
 
-      {:ok, schema}
+      {:ok, schema, "Options for building relationships"}
     end
   end
 
@@ -182,8 +181,7 @@ defmodule Smokestack.RelatedBuilder do
       |> Keyword.put(:attrs, %{})
 
     with {:ok, related_factory} <- find_related_factory(relationship.destination, factory),
-         {:ok, related_attrs} <-
-           Builder.build(__MODULE__, related_factory, related_options) do
+         {:ok, related_attrs} <- __MODULE__.build(related_factory, related_options) do
       case relationship.cardinality do
         :one ->
           {:ok, Map.put(attrs, relationship.name, related_attrs)}

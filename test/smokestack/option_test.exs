@@ -67,4 +67,21 @@ defmodule Smokestack.OptionTest do
       assert post.author.id == author.id
     end
   end
+
+  describe "variant" do
+    test "it can select a variant at build time" do
+      assert {:ok, author} = insert(Author, variant: :trek)
+      assert to_string(author.email) =~ ~r/\.(starfleet|rebellion)$/
+    end
+  end
+
+  test "it validates all options" do
+    assert {:error, error} = insert(Author, sss: 2)
+    message = Exception.message(error)
+    assert message =~ "unknown options [:sss]"
+
+    for key <- ~w[:variant :load :count :build :relate :attrs] do
+      assert message =~ key
+    end
+  end
 end

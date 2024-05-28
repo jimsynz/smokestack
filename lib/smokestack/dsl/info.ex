@@ -35,4 +35,16 @@ defmodule Smokestack.Dsl.Info do
       {:error, reason} -> raise reason
     end
   end
+
+  @doc """
+  List all variants available for a resource.
+  """
+  @spec variants(Smokestack.t(), Resource.t()) :: [atom]
+  def variants(factory, resource) do
+    factory
+    |> Extension.get_entities([:smokestack])
+    |> Enum.filter(&(is_struct(&1, Factory) && &1.resource == resource))
+    |> Enum.map(& &1.variant)
+    |> Enum.uniq()
+  end
 end

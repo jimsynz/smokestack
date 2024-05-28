@@ -30,9 +30,9 @@ defmodule Smokestack.ManyBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema(), String.t()} | {:error, error}
   def option_schema(factory) do
-    with {:ok, related_schema} <- RelatedBuilder.option_schema(factory) do
+    with {:ok, related_schema, related_section} <- RelatedBuilder.option_schema(factory) do
       schema =
         [
           count: [
@@ -53,16 +53,16 @@ defmodule Smokestack.ManyBuilder do
             """
           ]
         ]
-        |> Options.merge(related_schema, "Options for building relationships")
+        |> Options.merge(related_schema, related_section)
 
-      {:ok, schema}
+      {:ok, schema, "Options for building multiple instances"}
     end
   end
 
   defp do_build(factory, how_many, options) when how_many > 0 and is_integer(how_many) do
     1..how_many
     |> Enum.reduce_while({:ok, []}, fn _, {:ok, results} ->
-      case Builder.build(RelatedBuilder, factory, options) do
+      case RelatedBuilder.build(factory, options) do
         {:ok, attrs} -> {:cont, {:ok, [attrs | results]}}
         {:error, reason} -> {:halt, {:error, reason}}
       end

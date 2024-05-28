@@ -13,9 +13,9 @@ defmodule Support.Factory do
 
     attribute :email, fn
       %{name: "JL"} -> "captain@entrepreneur.starfleet"
-      %{name: "Doc Holoday"} -> "cheifmed@voyager.starfleet"
+      %{name: "Dr Mark"} -> "cheifmed@voyager.starfleet"
       %{name: "BLT"} -> "cheifeng@voyager.starfleet"
-      %{name: "Cal Hudson"} -> "cal@maquis.stfu"
+      %{name: "Cal Hudson"} -> "cal@maquis.rebellion"
     end
   end
 

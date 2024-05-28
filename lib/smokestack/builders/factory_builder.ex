@@ -48,7 +48,7 @@ defmodule Smokestack.FactoryBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema(), String.t()} | {:error, error}
   def option_schema(factory) do
     attr_keys =
       if factory do
@@ -80,7 +80,7 @@ defmodule Smokestack.FactoryBuilder do
          ```
          """
        ]
-     ]}
+     ], "Options for building instances"}
   end
 
   defp maybe_initialise_generator(attr) do

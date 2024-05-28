@@ -31,10 +31,10 @@ defmodule Smokestack.RecordBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema(), String.t()} | {:error, error}
   def option_schema(factory) do
-    with {:ok, related_schema} <- RelatedBuilder.option_schema(factory),
-         {:ok, many_schema} <- ManyBuilder.option_schema(factory) do
+    with {:ok, related_schema, related_section} <- RelatedBuilder.option_schema(factory),
+         {:ok, many_schema, many_section} <- ManyBuilder.option_schema(factory) do
       load_type =
         if factory do
           loadable_names =
@@ -87,10 +87,10 @@ defmodule Smokestack.RecordBuilder do
             """
           ]
         ]
-        |> Options.merge(many_schema, "Options for building multiple instances")
-        |> Options.merge(related_schema, "Options for building relationships")
+        |> Options.merge(many_schema, many_section)
+        |> Options.merge(related_schema, related_section)
 
-      {:ok, schema}
+      {:ok, schema, "Options for building records"}
     end
   end
 
@@ -98,7 +98,7 @@ defmodule Smokestack.RecordBuilder do
     {load, options} = Keyword.pop(options, :load, [])
     options = Keyword.put(options, :count, count)
 
-    with {:ok, attr_list} <- Builder.build(ManyBuilder, factory, options),
+    with {:ok, attr_list} <- ManyBuilder.build(factory, options),
          {:ok, record_list} <- seed(attr_list, factory) do
       record_list
       |> maybe_hook(factory)
@@ -109,7 +109,7 @@ defmodule Smokestack.RecordBuilder do
   defp do_build(factory, options, _count) do
     {load, options} = Keyword.pop(options, :load, [])
 
-    with {:ok, attrs} <- Builder.build(RelatedBuilder, factory, options),
+    with {:ok, attrs} <- RelatedBuilder.build(factory, options),
          {:ok, record} <- seed(attrs, factory) do
       record
       |> maybe_hook(factory)

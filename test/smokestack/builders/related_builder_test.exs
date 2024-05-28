@@ -7,21 +7,21 @@ defmodule Smokestack.RelatedBuilderTest do
 
   test "it can build attributes from directly related factories" do
     {:ok, factory} = Info.factory(Factory, Post, :default)
-    assert {:ok, attrs} = Builder.build(RelatedBuilder, factory, build: :author)
+    assert {:ok, attrs} = RelatedBuilder.build(factory, build: :author)
     assert byte_size(attrs[:author][:name]) > 0
   end
 
   test "it can build attributes from indirectly related factories" do
     {:ok, factory} = Info.factory(Factory, Post, :default)
-    assert {:ok, attrs} = Builder.build(RelatedBuilder, factory, build: [author: :posts])
+    assert {:ok, attrs} = RelatedBuilder.build(factory, build: [author: :posts])
     assert [post] = attrs[:author][:posts]
     assert byte_size(post[:title]) > 0
   end
 
   test "it can attach directly related records" do
     {:ok, factory} = Info.factory(Factory, Post, :default)
-    {:ok, author} = Builder.build(RecordBuilder, Info.factory!(Factory, Author, :default), [])
-    {:ok, attrs} = Builder.build(RelatedBuilder, factory, relate: [author: author])
+    {:ok, author} = RecordBuilder.build(Info.factory!(Factory, Author, :default), [])
+    {:ok, attrs} = RelatedBuilder.build(factory, relate: [author: author])
     assert attrs[:author] == author
   end
 end

@@ -7,14 +7,14 @@ defmodule Smokestack.ManyBuilderTest do
 
   test "it can build a factory more than once" do
     {:ok, factory} = Info.factory(Factory, Post, :default)
-    assert {:ok, results} = Builder.build(ManyBuilder, factory, count: 2)
+    assert {:ok, results} = ManyBuilder.build(factory, count: 2)
     assert length(results) == 2
     assert Enum.all?(results, &(byte_size(&1.title) > 0))
   end
 
   test "it errors when asked to build less than one instance" do
     {:ok, factory} = Info.factory(Factory, Post, :default)
-    assert {:error, reason} = Builder.build(ManyBuilder, factory, count: 0)
-    assert Exception.message(reason) =~ ~r/expected positive integer/i
+    assert {:error, reason} = ManyBuilder.build(factory, count: 0)
+    assert Exception.message(reason) =~ ~r/positive integer/i
   end
 end

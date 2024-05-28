@@ -7,14 +7,13 @@ defmodule Smokestack.FactoryBuilderTest do
 
   test "it can build attributes from a factory" do
     {:ok, factory} = Info.factory(Factory, Post, :default)
-    assert {:ok, attrs} = Builder.build(FactoryBuilder, factory, [])
+    assert {:ok, attrs} = FactoryBuilder.build(factory, [])
     assert byte_size(attrs[:title]) > 0
   end
 
   test "it allows attributes to be overridden" do
     {:ok, factory} = Info.factory(Factory, Post, :default)
 
-    assert {:ok, %{title: "wat"}} =
-             Builder.build(FactoryBuilder, factory, attrs: %{title: "wat"})
+    assert {:ok, %{title: "wat"}} = FactoryBuilder.build(factory, attrs: %{title: "wat"})
   end
 end

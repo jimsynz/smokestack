@@ -69,10 +69,10 @@ defmodule Smokestack.ParamBuilder do
 
   @doc false
   @impl true
-  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema()} | {:error, error}
+  @spec option_schema(nil | Factory.t()) :: {:ok, Options.schema(), String.t()} | {:error, error}
   def option_schema(factory) do
-    with {:ok, related_schema} <- RelatedBuilder.option_schema(factory),
-         {:ok, many_schema} <- ManyBuilder.option_schema(factory) do
+    with {:ok, related_schema, related_section} <- RelatedBuilder.option_schema(factory),
+         {:ok, many_schema, many_section} <- ManyBuilder.option_schema(factory) do
       many_schema =
         Keyword.update!(many_schema, :count, fn current ->
           current
@@ -178,10 +178,10 @@ defmodule Smokestack.ParamBuilder do
 
       schema =
         our_schema
-        |> Options.merge(many_schema, "Options for building multiple instances")
-        |> Options.merge(related_schema, "Options for building relationships")
+        |> Options.merge(many_schema, many_section)
+        |> Options.merge(related_schema, related_section)
 
-      {:ok, schema}
+      {:ok, schema, "Options for building parameters"}
     end
   end
 
@@ -189,7 +189,7 @@ defmodule Smokestack.ParamBuilder do
     {my_opts, their_opts} = split_options(options)
     their_opts = Keyword.put(their_opts, :count, count)
 
-    with {:ok, attr_list} <- Builder.build(ManyBuilder, factory, their_opts) do
+    with {:ok, attr_list} <- ManyBuilder.build(factory, their_opts) do
       attr_list
       |> convert_keys(my_opts)
       |> maybe_nest_result(my_opts[:nest])
@@ -200,7 +200,7 @@ defmodule Smokestack.ParamBuilder do
   defp do_build(factory, options, _) do
     {my_opts, their_opts} = split_options(options)
 
-    with {:ok, attrs} <- Builder.build(RelatedBuilder, factory, their_opts) do
+    with {:ok, attrs} <- RelatedBuilder.build(factory, their_opts) do
       attrs
       |> convert_keys(my_opts)
       |> maybe_nest_result(my_opts[:nest])

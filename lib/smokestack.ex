@@ -112,7 +112,7 @@ defmodule Smokestack do
 
   use Dsl, default_extensions: [extensions: [Smokestack.Dsl]]
   alias Ash.Resource
-  alias Smokestack.{Builder, Dsl.Info, ParamBuilder, RecordBuilder}
+  alias Smokestack.{Builder, ParamBuilder, RecordBuilder}
 
   @type t :: module
 
@@ -196,11 +196,7 @@ defmodule Smokestack do
         @spec params(Resource.t(), [Smokestack.param_option()]) ::
                 {:ok, ParamBuilder.result()} | {:error, any}
         def params(resource, options \\ []) do
-          {variant, options} = Keyword.pop(options, :variant, :default)
-
-          with {:ok, factory} <- Info.factory(__MODULE__, resource, variant) do
-            Builder.build(ParamBuilder, factory, options)
-          end
+          Builder.build(__MODULE__, resource, ParamBuilder, options)
         end
 
         @doc """
@@ -229,11 +225,7 @@ defmodule Smokestack do
         @spec insert(Resource.t(), [Smokestack.insert_option()]) ::
                 {:ok, RecordBuilder.result()} | {:error, any}
         def insert(resource, options \\ []) do
-          {variant, options} = Keyword.pop(options, :variant, :default)
-
-          with {:ok, factory} <- Info.factory(__MODULE__, resource, variant) do
-            Builder.build(RecordBuilder, factory, options)
-          end
+          Builder.build(__MODULE__, resource, RecordBuilder, options)
         end
 
         @doc """
