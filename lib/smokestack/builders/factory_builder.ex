@@ -32,7 +32,7 @@ defmodule Smokestack.FactoryBuilder do
         |> remove_overridden_attrs(overrides)
         |> Enum.reduce(overrides, fn attr, attrs ->
           generator = maybe_initialise_generator(attr)
-          value = Template.generate(generator, attr, options)
+          value = Template.generate(generator, attrs, options)
           Map.put(attrs, attr.name, value)
         end)
 
