@@ -178,6 +178,30 @@ defmodule Smokestack.DslTest do
     assert %Post{author: %Author{}} = AutoBuildFactory.insert!(Post)
   end
 
+  test "auto builds can be overridden at runtime" do
+    defmodule AutoBuildRelateFactory do
+      @moduledoc false
+      use Smokestack
+
+      factory Post do
+        attribute :title, &Faker.Company.catch_phrase/0
+        auto_build :author
+      end
+
+      factory Author do
+        attribute :name, &Faker.Internet.email/0
+        attribute :email, &Faker.Person.name/0
+      end
+    end
+
+    author = AutoBuildRelateFactory.insert!(Author)
+    post = AutoBuildRelateFactory.insert!(Post, relate: [author: author])
+
+    # The auto-build should not be used - the existing author should be used
+    assert Ash.count(Author) == 1
+    assert post.author.id == author.id
+  end
+
   test "auto loads can be specified in the factory" do
     defmodule AutoLoadFactory do
       @moduledoc false
