@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.9.1](https://harton.dev/james/smokestack/compare/v0.9.0...v0.9.1) (2024-05-30)
+
+
+
+
+### Bug Fixes:
+
+* allow auto builds to be replaced by explicit relate commands.
+
 ## [v0.9.0](https://harton.dev/james/smokestack/compare/v0.8.1...v0.9.0) (2024-05-28)
 
 
