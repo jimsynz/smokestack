@@ -198,7 +198,7 @@ defmodule Smokestack.DslTest do
     post = AutoBuildRelateFactory.insert!(Post, relate: [author: author])
 
     # The auto-build should not be used - the existing author should be used
-    assert Ash.count(Author) == 1
+    assert Ash.count!(Author, domain: Support.Domain) == 1
     assert post.author.id == author.id
   end
 

@@ -146,11 +146,11 @@ defmodule Smokestack.RelatedBuilder do
     |> Keyword.get(:build, [])
     |> List.wrap()
     |> Enum.concat(factory.auto_build)
-    |> List.wrap()
     |> Enum.map(fn
       {key, value} -> {key, value}
       key when is_atom(key) -> {key, []}
     end)
+    |> remove_explicit_relates(options)
     |> Enum.reduce_while({:ok, attrs}, fn {relationship, nested_builds}, {:ok, attrs} ->
       case build_related(
              attrs,
@@ -161,6 +161,18 @@ defmodule Smokestack.RelatedBuilder do
         {:ok, attrs} -> {:cont, {:ok, attrs}}
         {:error, reason} -> {:halt, {:error, reason}}
       end
+    end)
+  end
+
+  defp remove_explicit_relates(builds, options) do
+    relates =
+      options[:relate]
+      |> List.wrap()
+      |> Map.new()
+
+    builds
+    |> Enum.reject(fn {key, _value} ->
+      is_map_key(relates, key)
     end)
   end
 
