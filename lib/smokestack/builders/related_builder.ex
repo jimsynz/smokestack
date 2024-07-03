@@ -130,7 +130,7 @@ defmodule Smokestack.RelatedBuilder do
 
             ```elixir
             author = insert!(Author)
-            post = insert!(Post, relate: [author: Author])
+            post = insert!(Post, relate: [author: author])
             ```
             """
           ]
