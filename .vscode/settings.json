@@ -3,6 +3,8 @@
     "arities",
     "Cardassia",
     "recase",
-    "Slickback"
+    "Slickback",
+    "Sourceror",
+    "zipper"
   ]
 }
