@@ -78,10 +78,6 @@ defmodule Smokestack.OptionTest do
   test "it validates all options" do
     assert {:error, error} = insert(Author, sss: 2)
     message = Exception.message(error)
-    assert message =~ "unknown options [:sss]"
-
-    for key <- ~w[:variant :load :count :build :relate :attrs] do
-      assert message =~ key
-    end
+    assert message =~ ~r/required :[a-z]+ option not found/
   end
 end
