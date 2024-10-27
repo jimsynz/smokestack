@@ -10,7 +10,8 @@ spark_locals_without_parens = [
   domain: 1,
   factory: 1,
   factory: 2,
-  factory: 3
+  factory: 3,
+  variant: 1
 ]
 
 [
