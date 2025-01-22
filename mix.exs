@@ -104,6 +104,7 @@ defmodule Smokestack.MixProject do
       {:git_ops, "~> 2.6", opts},
       {:mix_audit, "~> 2.1", opts},
       {:recase, "~> 0.8"},
+      {:sourceror, "~> 1.7", opts},
       {:spark, "~> 2.1"}
     ]
   end
