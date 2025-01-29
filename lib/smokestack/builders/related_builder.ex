@@ -156,7 +156,7 @@ defmodule Smokestack.RelatedBuilder do
              attrs,
              relationship,
              factory,
-             Keyword.put(options, :build, nested_builds)
+             Keyword.put(options, :build, nested_builds) |> Keyword.drop([:relate])
            ) do
         {:ok, attrs} -> {:cont, {:ok, attrs}}
         {:error, reason} -> {:halt, {:error, reason}}
