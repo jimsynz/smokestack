@@ -5,6 +5,15 @@ See [Conventional Commits](Https://conventionalcommits.org) for commit guideline
 
 <!-- changelog -->
 
+## [v0.9.2](https://harton.dev/james/smokestack/compare/v0.9.1...v0.9.2) (2025-01-30)
+
+
+
+
+### Bug Fixes:
+
+* Prevent the `relate` option to trickle down to descendants when building
+
 ## [v0.9.1](https://harton.dev/james/smokestack/compare/v0.9.0...v0.9.1) (2024-05-30)
 
 
