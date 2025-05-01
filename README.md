@@ -3,6 +3,9 @@
 [![Build Status](https://drone.harton.dev/api/badges/james/smokestack/status.svg?ref=refs/heads/main)](https://drone.harton.nz/james/smokestack)
 [![Hippocratic License HL3-FULL](https://img.shields.io/static/v1?label=Hippocratic%20License&message=HL3-FULL&labelColor=5e2751&color=bc8c3d)](https://firstdonoharm.dev/version/3/0/full.html)
 
+> [!TIP]
+> Having spent some time with Smokestack, I no longer think it's the correct approach for test factories.  As highlihted in the testing chapter of [Ash Framework: Create Declarative Elixir Web Apps](https://pragprog.com/titles/ldash/ash-framework/) you should probably use a combination of `Ash.Generator` and `Ash.Seed`.
+
 Smokestack provides a way to define test factories for your [Ash Resources](https://ash-hq.org/docs/module/ash/latest/ash-resource) using a convenient DSL:
 
 ```elixir
