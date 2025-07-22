@@ -103,7 +103,7 @@ defmodule Smokestack.MixProject do
       {:faker, "~> 0.18", opts},
       {:git_ops, "~> 2.6", opts},
       {:mix_audit, "~> 2.1", opts},
-      {:recase, "~> 0.8"},
+      {:recase, "~> 0.9"},
       {:sourceror, "~> 1.7", opts},
       {:spark, "~> 2.1"}
     ]
