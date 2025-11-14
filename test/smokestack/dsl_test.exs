@@ -22,6 +22,7 @@ defmodule Smokestack.DslTest do
 
     relationships do
       belongs_to :author, Author
+      belongs_to :publisher, Author
     end
 
     calculations do
@@ -200,6 +201,30 @@ defmodule Smokestack.DslTest do
     # The auto-build should not be used - the existing author should be used
     assert Ash.count!(Author, domain: Support.Domain) == 1
     assert post.author.id == author.id
+  end
+
+  test "multiple auto builds can be run and related at the same time" do
+    defmodule AutoBuildMultipleRelateFactory do
+      @moduledoc false
+      use Smokestack
+
+      factory Post do
+        attribute :title, &Faker.Company.catch_phrase/0
+        auto_build [:author, :publisher]
+      end
+
+      factory Author do
+        attribute :name, &Faker.Internet.email/0
+        attribute :email, &Faker.Person.name/0
+      end
+    end
+
+    author = AutoBuildMultipleRelateFactory.insert!(Author)
+    post = AutoBuildMultipleRelateFactory.insert!(Post, relate: [author: author])
+    assert %Post{} = post
+    assert %Author{} = post.author
+    assert %Author{} = post.publisher
+    assert post.author.id != post.publisher.id
   end
 
   test "auto loads can be specified in the factory" do
